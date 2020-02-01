@@ -204,20 +204,20 @@ end
 
 u = User.find_by(username: 'toto')
 if u.nil?
-  u = User.new(username: 'toto', email: 'toto@hazeliris.com', password: 'totopass', tickets: 10)
+  u = User.new(username: 'toto', email: 'toto@hazeliris.com', password: 'totopass', tickets: 10, admin: true)
   u.save
 end
 
 t = Teacher.find_by(user_id: u.id)
 if t.nil?
-  t = Teacher.new(user_id: u.id, languages: ['fr', 'en', 'es'].map { |l| Language.find_by(code: l) })
+  t = Teacher.new(name: u.username, user_id: u.id, languages: ['fr', 'en', 'es'].map { |l| Language.find_by(code: l) })
   t.save
 end
 
 50.times do
   d = rand(1..10).days.from_now.to_date.to_datetime.change(hour: rand(7..22))
   if Course.where(time_slot: d).empty?
-    c = Course.new(teacher_id: t.id, time_slot: d)
+    c = Course.new(teacher_id: t.id, time_slot: d, zoom_url: "zoom_url")
     c.save
   end
 end

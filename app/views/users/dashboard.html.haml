@@ -11,19 +11,21 @@
         = link_to new_ticket_path do
           (Buy more)
 
-    - if !current_user.teacher_profile.nil?
-      %hr/
-    
+    - unless current_user.teacher_profile.nil?
+      %hr/    
       .card-text
         - current_user.teacher_profile.courses.planned.each do | c |
-          = "At #{c.time_slot} => Teaching #{c.language.name} (? level) to #{c.student.username}"
+          = "At #{c.time_slot} => Teaching #{c.language.name} to #{c.student.username}"
+          = link_to c.zoom_url do
+            %i.fas.fa-video
           %br/
         
-    %hr/
-      
-    .card-text      
-      - current_user.courses.each do | c |
-        = "At #{c.time_slot} => Learning #{c.language.name} (?? level) with #{c.teacher.user.username}"
+    %hr/      
+    .card-text
+      - current_user.courses.planned.each do | c |
+        = "At #{c.time_slot} => Learning #{c.language.name} with #{c.teacher.user.username}"
+        = link_to c.zoom_url do
+          %i.fas.fa-video
         %br/
 
   

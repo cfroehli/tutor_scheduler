@@ -6,12 +6,14 @@
     = csrf_meta_tags
     = csp_meta_tag
 
-    = javascript_pack_tag 'application', 'data-turbolinks-track': 'reload'
-
     = stylesheet_pack_tag 'bootstrap4', media: 'all', 'data-turbolinks-track': 'reload'
     = stylesheet_pack_tag 'fontawesome', media: 'all', 'data-turbolinks-track': 'reload'
-
     = yield :extra_styles
+
+    = javascript_pack_tag 'application', 'data-turbolinks-track': 'reload'
+    = javascript_pack_tag 'bootstrap4', 'data-turbolinks-track': 'reload', defer: true
+    = javascript_pack_tag 'fontawesome', 'data-turbolinks-track': 'reload', defer: true
+    = yield :extra_js
 
   %body
     .container
@@ -33,10 +35,14 @@
               %i.fas.fa-user-graduate
               Learning
             - if user_signed_in?
-              - if !current_user.teacher_profile.nil?
-                = link_to teachers_path, class: 'nav-item nav-link' do
+              - unless current_user.teacher_profile.nil?
+                = link_to teacher_path(current_user.teacher_profile), class: 'nav-item nav-link' do
                   %i.fas.fa-school
                   Teaching
+              - if true_user.admin?
+                = link_to users_path, class: 'nav-item nav-link' do
+                  %i.fas.fa-user-shield
+                  Admin
               = link_to edit_user_registration_path, class: 'nav-item nav-link' do
                 %i.fas.fa-user-cog
                 User settings
@@ -58,7 +64,9 @@
 
       = yield
 
-      = javascript_pack_tag 'bootstrap4', 'data-turbolinks-track': 'reload'
-      = javascript_pack_tag 'fontawesome', 'data-turbolinks-track': 'reload'
-
-      = yield :extra_js
+      - if current_user != true_user
+        .text-center.text-danger
+          = "-o-o-"
+          = "You are currently signed in as [#{current_user.username}] - "
+          = link_to "Cancel impersonation", stop_impersonating_users_path, method: :post
+          = "-o-o-"

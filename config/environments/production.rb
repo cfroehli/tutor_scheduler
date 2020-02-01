@@ -73,8 +73,20 @@ Rails.application.configure do
   # config.action_mailer.raise_delivery_errors = false
 
   # Devise setup
-  # config.action_mailer.default_url_options = { host: 'protected-wave-52959.herokuapp.com', port: 80 }
+  config.action_mailer.default_url_options = { host: 'calm-brushlands-77648.herokuapp.com', port: 80 }
 
+  # SendGrid setup
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.perform_deliveries = true
+  config.action_mailer.smtp_settings = {
+    :user_name => ENV['SENDGRID_USERNAME'],
+    :password => ENV['SENDGRID_PASSWORD'],
+    :domain => 'herokuapp.com',
+    :address => 'smtp.sendgrid.net',
+    :port => 587,
+    :authentication => :plain,
+    :enable_starttls_auto => true
+  }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

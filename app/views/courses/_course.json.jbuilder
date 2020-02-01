@@ -6,3 +6,4 @@ else
   json.language course.language.name
   json.student course.student.username
 end
+json.zoom_url course.zoom_url

@@ -20,46 +20,96 @@
         - else
           %br/
           Choose a day :
-          - @days.each do | day |
-            = link_to courses_path(@year, @month, day) do
+          - @days.each do |day|
+            = link_to courses_path(year: @year, month: @month, day: day) do
               = day
       - else
         %br/
         Choose a month :
-        - @months.each do | month |
-          = link_to courses_path(@year, month) do
+        - @months.each do |month|
+          = link_to courses_path(year: @year, month: month) do
             = month
     - else
       No course available.
   -else
+    .form-inline
+      - teachers = Teacher.where(courses: Course.available)
+      .col-sm-2
+        Filter by :
+
+      .dropdown.col-sm-5
+        %button.btn.btn-primary.dropdown-toggle#teacher_filter{type: 'button', 'data-toggle': 'dropdown', aria: {haspopup: 'true', expanded: 'false'}}
+          = "Teacher: #{@teacher_name or 'No filter'}"
+          .dropdown-menu{'aria-labelledby': 'teacher_filter'}
+            = link_to courses_path(language: @lang_code, teacher: nil), class: "dropdown-item #{'active' if @teacher_name.nil?}" do
+              No filter
+            .dropdown-divider
+            - teachers.pluck(:name).each do |teacher_name|
+              = link_to courses_path(language: @lang_code, teacher: teacher_name), class: "dropdown-item #{'active' if @teacher_name == teacher_name}" do
+                = teacher_name
+
+      .dropdown.col-sm-5
+        %button.btn.btn-primary.dropdown-toggle#lang_filter{type: 'button', 'data-toggle': 'dropdown', aria: {haspopup: 'true', expanded: 'false'}}
+          Language
+          = "Language: #{@lang_code or 'No filter'}"
+          .dropdown-menu{'aria-labelledby': 'lang_filter'}
+            = link_to courses_path(language: nil, teacher: @teacher_name), class: "dropdown-item #{'active' if @lang_code.nil?}" do
+              No filter
+            - TeachedLanguage.active.where(teacher: teachers).joins(:language).distinct.pluck(:code, :name).each do |lang_code, lang_name|
+              = link_to courses_path(language: lang_code, teacher: @teacher_name), class: "dropdown-item #{'active' if @lang_code == lang_code}" do
+                = lang_name
+
+
+      - content_for :extra_js do
+        :javascript
+          $(document).on('turbolinks:load', () => {
+            $('.dropdown-item').on('click', (event) => {
+              location.href = event.target.href;
+            });
+          });
+
     %br/
     Choose a year :
-    - @years.each do | year |
-      = link_to courses_path(year) do
+    - @years.each do |year|
+      = link_to courses_path(year: year) do
         = year
 
   %hr/
-  - if !@courses.empty?
-    %table
+  - unless @courses.empty?
+    %table{'data-toggle': 'table'}
       %thead
         %tr
-          %td Hour
-          %td Courses
+          %td.col-sm-2 Hour
+          %td.col-sm-10 Available Courses
       %tbody
         - courses_slots = @courses.keys.sort.reject { |v| v < 7 }.reject { |v| v > 22 }
-        - (7..22).each do | slot |
+        - (7..22).each do |slot|
           %tr
           - if courses_slots.first == slot
-            - @courses[courses_slots.shift].each do | course |
-              %td= slot
+            - @courses[courses_slots.shift].each do |course|
+              %td= "#{slot}H00 ~ #{slot+1}H00"
               %td
                 - teacher = course.teacher
-                - teacher.languages.each do | language |
-                  = link_to sign_up_path(id: course.id, language_id: language.id), method: :post do
-                    = "#{language.name} with #{teacher.user.username}"
-          - else
-            %td= slot
-            %td No course
+                .col-sm-3
+                  .card
+                    .card-header
+                      Teacher
+                      = link_to teacher_path(teacher) do
+                        = teacher.user.username
+                    .card-body
+                      - languages = teacher.languages
+                      - languages = languages.where(code: @lang_code) unless @lang_code.nil?
+                      - languages.each do |language|
+                        .card-text
+                          = link_to sign_up_course_path(course, language_id: language.id), method: :post do
+                            = "[#{language.name}]"
+
+    - content_for :extra_styles do
+      = stylesheet_pack_tag 'bootstrap-table', media: 'all', 'data-turbolinks-track': 'reload'
+
+    - content_for :extra_js do
+      = javascript_pack_tag 'bootstrap-table', 'data-turbolinks-track': 'reload', defer: true
+
 - else
   You need to
   = link_to new_ticket_path do

@@ -6,18 +6,23 @@
         - @teacher.errors.full_messages.each do |message|
           %li= message
 
-  .form-row
-    .form-group.col-sm-12
-      = f.hidden_field :image_cache
-      = f.label :image, class: 'col-form-label'
-      = f.file_field :image, class: 'form-control'
-  .form-row
-    .form-group.col-sm-12
-      = f.label :presentation, class: 'col-form-label'
-      = f.text_area :presentation, rows: 15, id: 'teacher-presentation-area', class: 'form-control'
+  .form-group.row
+    = f.label :name, class: 'col-form-label col-sm-2'
+    = f.text_field :name, class: 'form-control col-sm-10'
+
+  .form-group.row
+    = f.hidden_field :image_cache
+    .custom-file
+      = f.label :image, class: 'custom-file-label'
+      = f.file_field :image, class: 'custom-file-input cloudinary-fileupload'
+
+  .form-group.row
+    = f.label :presentation, class: 'col-form-label col-sm-2'
+    = f.text_area :presentation, rows: 15, id: 'teacher-presentation-area', class: 'form-control col-sm-10'
 
   %br/
-  = f.button 'Submit', class: 'btn btn-primary'
+  .text-center
+    = f.button 'Submit', class: 'btn btn-primary'
 
 - content_for :extra_js do
-  = javascript_pack_tag 'cloudinary_upload', 'data-turbolinks-track': 'reload'
+  = javascript_pack_tag 'cloudinary_upload', 'data-turbolinks-track': 'reload', defer: true

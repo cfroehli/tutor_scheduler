@@ -37,9 +37,12 @@ gem 'responders', '~> 3.0.0'
 # Authentification tools
 gem 'devise', '~> 4.7.1'
 
+# Impersonation
+gem 'pretender', '~> 0.3.4'
+
 # Roles/Authorization
 gem 'rolify'
-gem 'cancancan'
+gem 'pundit'
 
 # Image upload
 gem 'carrierwave', '< 2.0' # 2.0+ has issues (https://www.bountysource.com/issues/79107821-cloudinary-not-compatible-with-carrierwave-2-0)
@@ -47,6 +50,10 @@ gem 'cloudinary', '~> 1.13'
 
 # Inline css in email
 gem 'roadie', '~> 4.0'
+
+#
+gem 'stripe'
+gem 'httparty', '~> 0.17.3'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
