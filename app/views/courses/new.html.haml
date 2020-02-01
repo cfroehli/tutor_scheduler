@@ -1,0 +1,44 @@
+- if current_user.teacher_profile
+  %h3.text-center Registering new courses slots
+
+  = form_with id: 'new-course-form', model: @course do |f|
+    - if @course.errors.any?
+      #error_explanation
+        %h2= "#{pluralize(@course.errors.count, "error")} prohibited this course from being saved:"
+        %ul
+          - @course.errors.full_messages.each do |message|
+            %li= message
+
+    .form-group
+      .input-group.date#day_picker{data: {'target-input':"nearest", 'date-format': "YYYY-MM-DD HH:00"}}
+        = f.label :time_slot, class: 'form-control col-sm-2'
+        = f.text_field :time_slot, class: 'form-control datetimepicker-input', 'data-target': "#day_picker"
+        .input-group-append{data: {target:"#day_picker", toggle:"datetimepicker"}}
+          .input-group-text
+            %i.fas.fa-calendar
+
+      %br/
+      .text-center
+        = f.button 'Add', class: 'btn btn-primary', data: { disable_with: "Registering course..." }
+
+  %table{'data-url': "/courses/list"}
+    %thead
+      %tr
+        %th{'data-field':"time_slot"} Date
+        %th{'data-field':"language"} Language
+        %th{'data-field':"student"} Student
+
+- else
+
+  Create a
+  = link_to new_teacher_path do
+    teaching profile
+
+
+- content_for :extra_styles do
+  = stylesheet_pack_tag 'bootstrap-tempusdominus', media: 'all', 'data-turbolinks-track': 'reload'
+  = stylesheet_pack_tag 'bootstrap-table', media: 'all', 'data-turbolinks-track': 'reload'
+
+- content_for :extra_js do
+  = javascript_pack_tag 'bootstrap-tempusdominus', 'data-turbolinks-track': 'reload'
+  = javascript_pack_tag 'bootstrap-table', 'data-turbolinks-track': 'reload'

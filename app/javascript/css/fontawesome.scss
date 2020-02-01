@@ -1,0 +1,8 @@
+// webpacker can't resolve font files due to relative
+// path '../webfonts' used in the module variables.scss
+// override with the full path
+$fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
+
+@import '@fortawesome/fontawesome-free/scss/fontawesome.scss';
+@import '@fortawesome/fontawesome-free/scss/regular.scss';
+@import '@fortawesome/fontawesome-free/scss/solid.scss';

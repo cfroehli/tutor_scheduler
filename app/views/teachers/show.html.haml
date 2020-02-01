@@ -1,0 +1,6 @@
+%h3.text-center= "#{@teacher.name}'s profile"
+
+- @teacher.languages.each do |l|
+  = l.name
+= @teacher.presentation
+etc, etc...

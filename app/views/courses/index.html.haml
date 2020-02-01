@@ -1,0 +1,67 @@
+%h3.text-center Sign up for a course
+
+= "Remaining tickets : #{current_user.tickets}"
+
+%hr/
+- if current_user.tickets > 0
+  - if @years.empty?
+    - if @year
+      %span &#47;
+      = link_to courses_path(year: @year) do
+        = @year
+      - if @months.empty?
+        %span &#47;
+        = link_to courses_path(year: @year, month: @month) do
+          = @month
+        - if @days.empty?
+          %span &#47;
+          = link_to courses_path(year: @year, month: @month) do
+            = @day
+        - else
+          %br/
+          Choose a day :
+          - @days.each do | day |
+            = link_to courses_path(@year, @month, day) do
+              = day
+      - else
+        %br/
+        Choose a month :
+        - @months.each do | month |
+          = link_to courses_path(@year, month) do
+            = month
+    - else
+      No course available.
+  -else
+    %br/
+    Choose a year :
+    - @years.each do | year |
+      = link_to courses_path(year) do
+        = year
+
+  %hr/
+  - if !@courses.empty?
+    %table
+      %thead
+        %tr
+          %td Hour
+          %td Courses
+      %tbody
+        - courses_slots = @courses.keys.sort.reject { |v| v < 7 }.reject { |v| v > 22 }
+        - (7..22).each do | slot |
+          %tr
+          - if courses_slots.first == slot
+            - @courses[courses_slots.shift].each do | course |
+              %td= slot
+              %td
+                - teacher = course.teacher
+                - teacher.languages.each do | language |
+                  = link_to sign_up_path(id: course.id, language_id: language.id), method: :post do
+                    = "#{language.name} with #{teacher.user.username}"
+          - else
+            %td= slot
+            %td No course
+- else
+  You need to
+  = link_to new_ticket_path do
+    buy at least one ticket
+  to be able to reserve a course.

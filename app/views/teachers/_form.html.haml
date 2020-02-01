@@ -1,0 +1,23 @@
+= form_with model: @teacher do |f|
+  - if @teacher.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@teacher.errors.count, "error")} prohibited this profile from being saved:"
+      %ul
+        - @teacher.errors.full_messages.each do |message|
+          %li= message
+
+  .form-row
+    .form-group.col-sm-12
+      = f.hidden_field :image_cache
+      = f.label :image, class: 'col-form-label'
+      = f.file_field :image, class: 'form-control'
+  .form-row
+    .form-group.col-sm-12
+      = f.label :presentation, class: 'col-form-label'
+      = f.text_area :presentation, rows: 15, id: 'teacher-presentation-area', class: 'form-control'
+
+  %br/
+  = f.button 'Submit', class: 'btn btn-primary'
+
+- content_for :extra_js do
+  = javascript_pack_tag 'cloudinary_upload', 'data-turbolinks-track': 'reload'

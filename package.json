@@ -1,0 +1,22 @@
+{
+  "name": "tutor_scheduler",
+  "private": true,
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.12.0",
+    "@rails/actioncable": "^6.0.0",
+    "@rails/activestorage": "^6.0.0",
+    "@rails/ujs": "^6.0.0",
+    "@rails/webpacker": "4.2.2",
+    "bootstrap": "^4.4.1",
+    "bootstrap-table": "^1.15.5",
+    "cloudinary": "^1.18.1",
+    "jquery": "^3.4.1",
+    "popper.js": "^1.16.0",
+    "tempusdominus-bootstrap-4": "^5.1.2",
+    "turbolinks": "^5.2.0"
+  },
+  "version": "0.1.0",
+  "devDependencies": {
+    "webpack-dev-server": "^3.10.1"
+  }
+}

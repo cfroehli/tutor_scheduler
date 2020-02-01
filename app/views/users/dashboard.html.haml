@@ -1,0 +1,29 @@
+.card
+  .card-header
+    %i.fa.fa-user
+    = "#{current_user.username}'s dashboard"
+  .card-body
+    .card-text      
+      - if current_user.tickets == 0
+        Refill
+      - else
+        = "Remaining tickets: #{current_user.tickets}"
+        = link_to new_ticket_path do
+          (Buy more)
+
+    - if !current_user.teacher_profile.nil?
+      %hr/
+    
+      .card-text
+        - current_user.teacher_profile.courses.planned.each do | c |
+          = "At #{c.time_slot} => Teaching #{c.language.name} (? level) to #{c.student.username}"
+          %br/
+        
+    %hr/
+      
+    .card-text      
+      - current_user.courses.each do | c |
+        = "At #{c.time_slot} => Learning #{c.language.name} (?? level) with #{c.teacher.user.username}"
+        %br/
+
+  

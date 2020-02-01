@@ -1,0 +1,15 @@
+%h3.text-center= "#{current_user.username}'s teacher profile"
+
+- if @teacher.nil?
+  = link_to new_teacher_path do
+    Create a teacher profile
+- else
+  = link_to edit_teacher_path(@teacher.id) do
+    Edit
+  %br/
+  = link_to new_course_path do
+    Register new course
+
+%hr/
+
+= render 'teacher', { teacher: @teacher }

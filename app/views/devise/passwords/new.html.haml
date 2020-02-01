@@ -1,0 +1,11 @@
+%h3.text-center Forgot your password?
+= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f|
+  = render "devise/shared/error_messages", resource: resource
+  .form-group.row
+    = f.label :username, class: 'col-sm-2 col-form-label'
+    .col-sm-10
+      = f.text_field :username, class: 'from-control', autofocus: true, autocomplete: 'username'
+  .form-group.row
+    .col-sm-12
+      = f.button 'Send me reset password instructions', class: 'btn btn-primary'
+= render "devise/shared/links"
