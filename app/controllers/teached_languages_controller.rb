@@ -2,13 +2,13 @@ class TeachedLanguagesController < ApplicationController
   def activate
     authorize TeachedLanguage
     change_active_state true
-    redirect_to users_path
+    redirect_to admin_index_path
   end
 
   def deactivate
     authorize TeachedLanguage
     change_active_state false
-    redirect_to users_path
+    redirect_to admin_index_path
   end
 
   private

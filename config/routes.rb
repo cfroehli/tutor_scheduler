@@ -1,12 +1,15 @@
 Rails.application.routes.draw do
   devise_for :users, path: 'auth', path_names: {sign_in: 'login', sign_out: 'logout', sign_up: 'register'}
-  resources :users, only: [:index] do
+  resources :users, only: [] do
+    get 'courses_history', on: :member
+  end
+  resources :admin, only: [:index] do
     post :impersonate, on: :member
     post :stop_impersonating, on: :collection
   end
   resources :courses,
     path: '/courses(/lang/:language)(/teacher/:teacher)(/:year(/:month(/:day(/:hour))))',
-    only: [:index, :create],
+    only: [:index],
     constraints: {
       language: /\w+/,
       teacher: /\w+/,
@@ -14,13 +17,12 @@ Rails.application.routes.draw do
       month: /\d+/,
       day: /\d+/,
       hour: /\d+/ }
-  resources :courses, only: [:create] do
+  resources :courses, only: [:create, :edit, :update] do
     post 'sign_up', on: :member
-    get 'list', on: :collection
   end
   resources :tickets, only: [:new, :create] do
     collection do
-      get 'checkout', constraints: {format: 'json'}
+      get 'checkout', constraints: {format: :json}
       get 'order_success'
       get 'order_cancel'
       get 'dashboard'
@@ -33,7 +35,11 @@ Rails.application.routes.draw do
     end
   end
   resources :teachers, except: [:destroy] do
-    post 'add_language', on: :collection
+    collection do
+      post 'add_language'
+      get 'action_required_courses'
+      get 'future_courses'
+    end
   end
   resources :stripe, only: [] do
     collection do

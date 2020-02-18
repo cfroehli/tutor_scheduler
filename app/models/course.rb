@@ -4,14 +4,20 @@ class Course < ApplicationRecord
   belongs_to :student, class_name: 'User', required: false, default: nil
 
   scope :with_teacher, ->(teacher) { where(teacher: teacher) }
+  scope :with_student, ->(student) { where(student: student) }
   scope :with_language, ->(language) { with_teacher(language.teachers) }
+
   scope :on_day, ->(year, month, day) { where('time_slot::date = ?', Date.new(year, month, day)) }
+  scope :signed_up, ->() { where.not(student: nil) }
+  scope :past, ->() { where('time_slot < CURRENT_TIMESTAMP') }
+  scope :future, ->() { where('time_slot >= CURRENT_TIMESTAMP') }
 
-  scope :future, ->() { where('time_slot > CURRENT_TIMESTAMP') }
+  scope :done, ->() { past.signed_up }
+  scope :planned, ->() { future.signed_up }
 
-  scope :planned, ->() { future.where.not(student: nil) }
+  scope :action_required, ->() { where(feedback: [nil, '']).or(where(content: [nil, ''])).done }
 
-  scope :available, ->() { future.where(student: nil) } do
+  scope :available, ->() { where(student: nil).future } do
     def years
       distinct
         .order(:year)

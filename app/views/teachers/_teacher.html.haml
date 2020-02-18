@@ -3,10 +3,11 @@
     .float-left
       - unless teacher.image.blank?
         = cl_image_tag teacher.image, secure:true
-      = teacher.name
+      = link_to teacher_path(teacher) do
+        = teacher.name
     .float-right
       - if current_user.id == teacher.user.id
-        = link_to edit_teacher_path(teacher.id) do
+        = link_to edit_teacher_path(teacher) do
           %i.fa.fa-edit
     .clearfix
   .card-body

@@ -14,18 +14,49 @@
     - unless current_user.teacher_profile.nil?
       %hr/    
       .card-text
+        .h4 Planned tutoring 
         - current_user.teacher_profile.courses.planned.each do | c |
-          = "At #{c.time_slot} => Teaching #{c.language.name} to #{c.student.username}"
-          = link_to c.zoom_url do
-            %i.fas.fa-video
-          %br/
+          .row
+            .col-sm-3
+              At #{c.time_slot} 
+            .col-sm-3
+              Teaching #{c.language.name} to #{c.student.username}
+              = link_to c.zoom_url do
+                %i.fas.fa-video
+            .col-sm-6
+              - if c.content.nil?
+                No content available yet.
+              - else
+                #{c.content}
         
     %hr/      
     .card-text
+      .h4 Planned learning 
       - current_user.courses.planned.each do | c |
-        = "At #{c.time_slot} => Learning #{c.language.name} with #{c.teacher.user.username}"
-        = link_to c.zoom_url do
-          %i.fas.fa-video
-        %br/
+        .row
+          .col-sm-3
+            At #{c.time_slot} 
+          .col-sm-3
+            Learning #{c.language.name} with #{c.teacher.user.username}
+            = link_to c.zoom_url do
+              %i.fas.fa-video
+          .col-sm-6
+            - if c.content.blank?
+              No content available yet
+            - else
+              #{c.content}      
 
-  
+    %hr/
+    .card-text
+      .h4 Past courses
+      - current_user.courses.past.each do | c |
+        .row 
+          .col-sm-3
+            At #{c.time_slot}
+          .col-sm-3
+            Learnt #{c.language.name} with #{c.teacher.user.username}
+          .col-sm-6
+            - if c.feedback.blank?
+              No feedback available yet.
+            - else
+              #{c.feedback}

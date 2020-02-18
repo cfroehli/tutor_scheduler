@@ -1,0 +1,13 @@
+.h3.text-center #{@student.username}'s courses history
+
+- if @courses.empty?
+  No courses history
+- else
+  - @courses.each do |course|
+    .row
+      .col-sm-3
+        #{course.time_slot}
+      .col-sm-3
+        #{course.language.name} with #{course.teacher.name}
+      .col-sm-6
+        #{course.content}

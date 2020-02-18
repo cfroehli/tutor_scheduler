@@ -6,7 +6,7 @@
     - User.order(:id).each do |user|
       .card-text
         Sign in as
-        = link_to user.username, impersonate_user_path(user), method: :post
+        = link_to user.username, impersonate_admin_path(user), method: :post
 
 %br/
 

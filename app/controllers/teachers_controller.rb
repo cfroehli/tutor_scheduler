@@ -45,7 +45,19 @@ class TeachersController < ApplicationController
     else
       flash[:info] = "Language #{teached_language.language.name} already available for teacher #{teached_language.teacher.name}."
     end
-    redirect_to users_path
+    redirect_back fallback_location: root_path
+  end
+
+  def action_required_courses
+    order = params[:order] == 'asc' ? :asc : :desc
+    @courses = current_user.teacher_profile.courses
+      .action_required
+      .order(time_slot: order)
+  end
+
+  def future_courses
+    order = params[:order] == 'asc' ? :asc : :desc
+    @courses = current_user.teacher_profile.courses.future.order(time_slot: order)
   end
 
   private

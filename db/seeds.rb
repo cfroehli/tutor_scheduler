@@ -210,12 +210,17 @@ end
 
 t = Teacher.find_by(user_id: u.id)
 if t.nil?
-  t = Teacher.new(name: u.username, user_id: u.id, languages: ['fr', 'en', 'es'].map { |l| Language.find_by(code: l) })
+  t = Teacher.new(name: u.username, user_id: u.id)
   t.save
+  ['fr', 'en', 'es'].each do |lang_code|
+    lang = Language.find_by(code: lang_code)
+    tl = TeachedLanguage.new(teacher: t, language: lang, active: true)
+    tl.save
+  end
 end
 
 50.times do
-  d = rand(1..10).days.from_now.to_date.to_datetime.change(hour: rand(7..22))
+  d = rand(-5..5).days.from_now.to_date.to_datetime.change(hour: rand(7..22))
   if Course.where(time_slot: d).empty?
     c = Course.new(teacher_id: t.id, time_slot: d, zoom_url: "zoom_url")
     c.save

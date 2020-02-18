@@ -6,7 +6,6 @@ class CoursesController < ApplicationController
     @year, @month, @day = params[:year], params[:month], params[:day]
 
     @lang_code, @teacher_name = params[:language], params[:teacher]
-    #todo handle non existant values ...
     teacher = Teacher.find_by(name: @teacher_name) unless @teacher_name.nil?
     language = Language.find_by(code: @lang_code) unless @lang_code.nil?
 
@@ -34,11 +33,7 @@ class CoursesController < ApplicationController
   end
 
   def show
-    @course = Course.find(params[:id])
-  end
-
-  def list
-    @courses = current_user.teacher_profile.courses.future.order(time_slot: :asc)
+    @course = find_course
   end
 
   def create
@@ -49,18 +44,39 @@ class CoursesController < ApplicationController
     redirect_back fallback_location: root_path
   end
 
-  def update
-    post_params = params.require(:course).permit(:teacher_id, :time_slot, :zoom_url)
-    flash[:success] = 'Course was successfully updated.' if @course.update(post_params)
-    respond_with @course
+  def edit
+    @course = find_course
   end
 
-##  def destroy
-##    flash[:success] = 'Course was successfully destroyed.' if @course.
-##  end
+  def update
+    post_params = params.require(:course).permit(:zoom_url, :content, :feedback)
+    course = find_course
+    if course.update(post_params)
+      flash[:success] = 'Course was successfully updated.'
+      if course.feedback_changed?
+        CourseMailer.notify_feedback_update(course).deliver_later
+      end
+    end
+    redirect_back fallback_location: root_path
+  end
 
   def sign_up
-    course = Course.find(params[:id])
+    course = find_course
+
+    teacher_profile = current_user.teacher_profile
+    if !teacher_profile.nil?
+      if teacher_profile.id == course.teacher.id
+        flash[:info] = "Unable to sign up for your own course."
+        redirect_back fallback_location: root_path and return
+      end
+
+      teaching_slot = teacher_profile.courses.where(time_slot: course.time_slot)
+      if !teaching_slot.empty?
+        flash[:info] = "Unable to sign up : You already have a teaching slot registered at the same time."
+        redirect_back fallback_location: root_path and return
+      end
+    end
+
     Course.transaction do
       course.student = current_user
       course.language = Language.find(params[:language_id])
@@ -70,8 +86,15 @@ class CoursesController < ApplicationController
       current_user.save
     end
 
+    CourseMailer.sign_up(course).deliver_later
+    CourseMailer.reservation(course).deliver_later
+
     flash[:success] = "Signed up for a [#{course.language.name}] course with [#{course.teacher.user.username}] at [#{course.time_slot}]."
-    # TODO send notification mail here
     redirect_to courses_path
+  end
+
+  private
+  def find_course
+    Course.find(params[:id])
   end
 end

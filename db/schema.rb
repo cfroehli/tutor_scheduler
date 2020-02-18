@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_03_093229) do
+ActiveRecord::Schema.define(version: 2020_02_18_090756) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -23,6 +23,8 @@ ActiveRecord::Schema.define(version: 2020_02_03_093229) do
     t.string "zoom_url", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.text "feedback"
+    t.text "content"
     t.index ["language_id"], name: "index_courses_on_language_id"
     t.index ["student_id"], name: "index_courses_on_student_id"
     t.index ["teacher_id", "time_slot"], name: "index_courses_on_teacher_id_and_time_slot", unique: true

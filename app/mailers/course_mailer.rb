@@ -14,4 +14,12 @@ class CourseMailer < ApplicationMailer
       subject: 'Course sign up notification'
     )
   end
+
+  def notify_feedback_update(course)
+    @course = course
+    mail(
+      to: @course.student.email,
+      subject: 'Course feedback update notification'
+    )
+  end
 end
