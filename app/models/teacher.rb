@@ -1,7 +1,6 @@
 class Teacher < ApplicationRecord
-  # TODO add db constraint
-  # validates :courses, uniqueness: { scope: :teacher_id, message: 'This profile already exist' }
-  # validates :name, uniqueness: true
+  validates :name, uniqueness: true, length: { minimum: 1, maximum: 20 }
+  validates_format_of :name, with: /\A[a-zA-Z0-9_ \.\-]+\z/
   
   belongs_to :user
 

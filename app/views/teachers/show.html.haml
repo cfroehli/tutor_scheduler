@@ -1,6 +1,9 @@
 %h3.text-center Teacher profile
 
 - if @teacher
+  - content_for :packs, 'bootstrap-table,bootstrap-tempusdominus,bootstrap-multiselect,tutor-scheduler-teachers'
+  - content_for :no_css_packs, 'tutor-scheduler-teachers'
+
   = render 'teacher', {teacher: @teacher}
 
   - if current_user.id == @teacher.user.id
@@ -8,7 +11,7 @@
 
     %h3.text-center Registering new courses slots
 
-    = form_with id: 'new-course-form', model: @course do |f|
+    = form_with url: courses_path  do |f|
       - if @course.errors.any?
         #error_explanation
           %h2= "#{pluralize(@course.errors.count, "error")} prohibited this course from being saved:"
@@ -17,17 +20,23 @@
               %li= message
 
       .form-group
-        .input-group.date#day_picker{data: {'target-input':"nearest", 'date-format': "YYYY-MM-DD HH:00"}}
-          = f.label :time_slot, class: 'form-control col-sm-2'
-          = f.text_field :time_slot, class: 'form-control datetimepicker-input', 'data-target': "#day_picker"
-          .input-group-append{data: {target:"#day_picker", toggle:"datetimepicker"}}
+        .input-group.date#day_picker{data: {'target-input':"nearest", 'date-format': "YYYY-MM-DD", 'date-allow-multidate': "true", 'date-min-date': "#{Date.today.strftime('%Y-%m-%d')}"}}
+          = f.label :days, class: 'form-control col-sm-2'
+          = f.text_field :days, class: 'form-control datetimepicker-input', 'data-target': "#day_picker"
+          .input-group-append{data: {target: "#day_picker", toggle: "datetimepicker"}}
             .input-group-text
               %i.fas.fa-calendar
 
-      .form-group
+        .input-group
+          = f.label :hours, class: 'form-control col-sm-2'
+          - hours = [['Early birds', [7, 8]], ['Morning', [9, 10, 11]], ['Noon', [12, 13]], ['Afternoon', [14, 15, 16, 17]], ['Evening', [18, 19, 20]], ['Nigth Owl', [21, 22]]]
+          = f.select :hours, grouped_options_for_select(hours), {}, {class: 'form-control col-sm-10', multiple: 'multiple'}
+
         .input-group
           = f.label :zoom_url, class: 'form-control col-sm-2'
           = f.text_field :zoom_url, class: 'form-control'
+
+      %br/
 
       .text-center
         = f.button 'Add', class: 'btn btn-primary', data: { disable_with: "Registering course..." }
@@ -53,26 +62,6 @@
           %th{'data-field':"language"} Language
           %th{'data-field':"student", 'data-formatter':'student_history_formatter'} Student
           %th{'data-field':"zoom_url"} Zoom
-
-    - content_for :extra_styles do
-      = stylesheet_pack_tag 'bootstrap-tempusdominus', media: 'all', 'data-turbolinks-track': 'reload'
-      = stylesheet_pack_tag 'bootstrap-table', media: 'all', 'data-turbolinks-track': 'reload'
-
-
-    - content_for :extra_js do
-      = javascript_pack_tag 'bootstrap-tempusdominus', 'data-turbolinks-track': 'reload', defer: true
-      :javascript
-        $(document).on('turbolinks:load', () => {
-          window.action_formatter = function action_formatter(value) {
-            return value.set_content_link + ' ' + value.set_feedback_link;
-          };
-          window.student_history_formatter = function student_history_formatter(value, row) {
-            if(row.student == '-')
-              return value;
-            return row.courses_history_link;
-          };
-        });
-      = javascript_pack_tag 'bootstrap-table', 'data-turbolinks-track': 'reload', defer: true
 
 - else
 

@@ -1,9 +1,10 @@
-import 'css/bootstrap-table.scss';
+import $ from 'jquery';
 
+import 'css/bootstrap-table.scss';
 import 'bootstrap-table';
 
-$(document).on("turbolinks:load", () => {
-  $("table[data-source-form]").each(() => {
+$(document).on("turbolinks:load", function() {
+  $("table[data-source-form]").each(function() {
     var table = $(this);
     table.bootstrapTable();
 
@@ -20,6 +21,6 @@ $(document).on("turbolinks:load", () => {
   });
 });
 
-$(document).on("turbolinks:render", () => {
+$(document).on("turbolinks:render", function() {
   $("[data-toggle='table']").bootstrapTable();
 });

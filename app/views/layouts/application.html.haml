@@ -6,14 +6,13 @@
     = csrf_meta_tags
     = csp_meta_tag
 
-    = stylesheet_pack_tag 'bootstrap4', media: 'all', 'data-turbolinks-track': 'reload'
-    = stylesheet_pack_tag 'fontawesome', media: 'all', 'data-turbolinks-track': 'reload'
-    = yield :extra_styles
-
-    = javascript_pack_tag 'application', 'data-turbolinks-track': 'reload'
-    = javascript_pack_tag 'bootstrap4', 'data-turbolinks-track': 'reload', defer: true
-    = javascript_pack_tag 'fontawesome', 'data-turbolinks-track': 'reload', defer: true
+    - packs = ([ 'common' ] + (content_for(:packs) || '').split(/,/)).uniq
+    = javascript_packs_with_chunks_tag *packs, 'data-turbolinks-track': 'reload', defer: true
     = yield :extra_js
+    - no_css_packs = (content_for(:no_css_packs) || '').split(/,/).uniq
+    - packs = packs.filter {|pack| !no_css_packs.include? pack}
+    = stylesheet_packs_with_chunks_tag *packs, media: 'all', 'data-turbolinks-track': 'reload'
+    = yield :extra_styles
 
   %body
     .container
@@ -43,6 +42,9 @@
                 = link_to admin_index_path, class: 'nav-item nav-link' do
                   %i.fas.fa-user-shield
                   Admin
+                = link_to stats_path, class: 'nav-item nav-link' do
+                  %i.fas.fa-chart-bar
+                  Stats
               = link_to edit_user_registration_path, class: 'nav-item nav-link' do
                 %i.fas.fa-user-cog
                 User settings

@@ -7,22 +7,32 @@ Rails.application.routes.draw do
     post :impersonate, on: :member
     post :stop_impersonating, on: :collection
   end
-  resources :courses,
-    path: '/courses(/lang/:language)(/teacher/:teacher)(/:year(/:month(/:day(/:hour))))',
-    only: [:index],
-    constraints: {
+  resources :stats, only: [:index] do
+    collection do
+      get 'courses_hourly', format: :json
+      get 'courses_teachers', format: :json
+      get 'courses_teacher_monthly', format: :json
+      get 'courses_teacher_weekly', format: :json
+      get 'courses_languages', format: :json
+      get 'courses_language_monthly', format: :json
+      get 'courses_language_weekly', format: :json
+    end
+  end
+  resources :courses, only: [:index, :create, :edit, :update] do
+    post 'sign_up', on: :member
+    get '(/lang/:language)(/teacher/:teacher)(/:year(/:month(/:day(/:hour))))',
+      to: 'courses#index',
+      on: :collection,
       language: /\w+/,
       teacher: /\w+/,
       year: /\d+/,
       month: /\d+/,
       day: /\d+/,
-      hour: /\d+/ }
-  resources :courses, only: [:create, :edit, :update] do
-    post 'sign_up', on: :member
+      hour: /\d+/
   end
   resources :tickets, only: [:new, :create] do
     collection do
-      get 'checkout', constraints: {format: :json}
+      get 'checkout', format: :json
       get 'order_success'
       get 'order_cancel'
       get 'dashboard'

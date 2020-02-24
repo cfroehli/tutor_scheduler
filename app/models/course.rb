@@ -5,19 +5,20 @@ class Course < ApplicationRecord
 
   scope :with_teacher, ->(teacher) { where(teacher: teacher) }
   scope :with_student, ->(student) { where(student: student) }
-  scope :with_language, ->(language) { with_teacher(language.teachers) }
+  scope :with_language, ->(language) { where(language: language).or(with_teacher(language.teachers)) }
 
   scope :on_day, ->(year, month, day) { where('time_slot::date = ?', Date.new(year, month, day)) }
-  scope :signed_up, ->() { where.not(student: nil) }
-  scope :past, ->() { where('time_slot < CURRENT_TIMESTAMP') }
-  scope :future, ->() { where('time_slot >= CURRENT_TIMESTAMP') }
+  scope :signed_up, -> { where.not(student: nil) }
+  scope :open, -> { where(student: nil) }
+  scope :past, -> { where('time_slot < CURRENT_TIMESTAMP') }
+  scope :future, -> { where('time_slot >= CURRENT_TIMESTAMP') }
 
-  scope :done, ->() { past.signed_up }
-  scope :planned, ->() { future.signed_up }
+  scope :done, -> { past.signed_up }
+  scope :planned, -> { future.signed_up }
 
-  scope :action_required, ->() { where(feedback: [nil, '']).or(where(content: [nil, ''])).done }
+  scope :action_required, -> { where(feedback: [nil, '']).or(where(content: [nil, ''])).done }
 
-  scope :available, ->() { where(student: nil).future } do
+  scope :available, -> { future.open } do
     def years
       distinct
         .order(:year)

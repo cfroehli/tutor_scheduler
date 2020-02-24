@@ -1,3 +1,5 @@
+- content_for :packs, 'cloudinary-upload'
+
 = form_with model: @teacher do |f|
   - if @teacher.errors.any?
     #error_explanation
@@ -23,6 +25,3 @@
   %br/
   .text-center
     = f.button 'Submit', class: 'btn btn-primary'
-
-- content_for :extra_js do
-  = javascript_pack_tag 'cloudinary_upload', 'data-turbolinks-track': 'reload', defer: true

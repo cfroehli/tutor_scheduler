@@ -1,0 +1,95 @@
+- content_for :packs, 'bootstrap-tempusdominus,bootstrap-table,tutor-scheduler-stats'
+- content_for :no_css_packs, 'tutor-scheduler-stats'
+
+.h3.text-center Hourly statistics
+
+.form-row
+  .col
+    .input-group.date#start_day_picker{data: {'target-input':"nearest", 'date-format': "YYYY-MM-DD"}}
+      = label_tag :start_day, nil, class: 'form-control col-sm-2'
+      = text_field_tag :start_day, nil, class: 'form-control datetimepicker-input', 'data-target': "#start_day_picker"
+      .input-group-append{data: {target: "#start_day_picker", toggle: "datetimepicker"}}
+        .input-group-text
+          %i.fas.fa-calendar
+
+  .col
+    .input-group.date#end_day_picker{data: {'target-input':"nearest", 'date-format': "YYYY-MM-DD"}}
+      = label_tag :end_day, nil, class: 'form-control col-sm-2'
+      = text_field_tag :end_day, nil, class: 'form-control datetimepicker-input', 'data-target': "#end_day_picker"
+      .input-group-append{data: {target: "#end_day_picker", toggle: "datetimepicker"}}
+        .input-group-text
+          %i.fas.fa-calendar
+
+%br/
+
+%table.text-center#hourly_stats{data: {url: courses_hourly_stats_path, 'query-params': 'hourly_stats_query_params', toggle: 'table'}}
+  %thead
+    %tr
+      %th
+      - (7..22).each do |hour|
+        %th{data: {formatter: 'stats_text_formatter', 'cell-style': 'stats_style_formatter'}}= "#{hour}H"
+
+%br/
+
+.form-row
+  .col
+    .input-group.date#year_picker{data: {'target-input':"nearest", 'date-format': "YYYY"}}
+      = label_tag :year, nil, class: 'form-control col-sm-2'
+      = text_field_tag :year, nil, class: 'form-control datetimepicker-input', 'data-target': "#year_picker"
+      .input-group-append{data: {target: "#year_picker", toggle: "datetimepicker"}}
+        .input-group-text
+          %i.fas.fa-calendar
+%br/
+
+.h3.text-center Teachers statistics
+
+%table.text-center#teachers_stats{data: {url: courses_teachers_stats_path,
+                                  'monthly-stats-url': courses_teacher_monthly_stats_path,
+                                  'weekly-stats-url': courses_teacher_weekly_stats_path,
+                                  'query-params': 'stats_query_params', toggle: 'table'}}
+  %thead
+    %tr
+      %th
+      - 'JFMAMJJASOND'.each_char do |month|
+        %th{data: {formatter: 'stats_text_formatter', 'cell-style': 'stats_style_formatter'}}= month
+.h9.text-center Click on a cell for details
+
+.h3.text-center Languages statistics
+
+%table.text-center#languages_stats{data: {url: courses_languages_stats_path,
+                                   'monthly-stats-url': courses_language_monthly_stats_path,
+                                   'weekly-stats-url': courses_language_weekly_stats_path,
+                                   'query-params': 'stats_query_params', toggle: 'table'}}
+  %thead
+    %tr
+      %th
+      - 'JFMAMJJASOND'.each_char do |month|
+        %th{data: {formatter: 'stats_text_formatter', 'cell-style': 'stats_style_formatter'}}= month
+.h9.text-center Click on a cell for details
+
+
+.modal.fade#stats_details{tabindex: '-1', role: 'dialog'}
+  .modal-dialog.modal-xl.modal-dialog-centered{role: 'document'}
+    .modal-content
+      .modal-header
+        %h5.modal-title Statistics details
+        %button.close{type: "button",  'data-dismiss':"modal", 'aria-label':"Close"}
+          %span{'aria-hidden':"true"} &times;
+
+      .modal-body
+        %table#monthly_stats_details{data: {'query-params': 'stats_details_query_params', toggle: 'table'}}
+          %thead
+            %tr
+              - (1..31).each do |day|
+                %th{data: {formatter: 'stats_text_formatter', 'cell-style': 'stats_style_formatter'}}= day
+
+        %br/
+
+        %table#weekly_stats_details{data: {'query-params': 'stats_details_query_params', toggle: 'table'}}
+          %thead
+            %tr
+              - 'SMTWTFS'.each_char do |day|
+                %th{data: {formatter: 'stats_text_formatter', 'cell-style': 'stats_style_formatter'}}= day
+
+      .modal-footer
+        %button.btn.btn-secondary{type: 'button', 'data-dismiss': 'modal'} Close

@@ -37,10 +37,18 @@ class CoursesController < ApplicationController
   end
 
   def create
-    post_params = params.require(:course).permit(:time_slot, :zoom_url)
-    time_slot = DateTime.parse(post_params[:time_slot])
-    @course = current_user.teacher_profile.courses.new(time_slot: time_slot, zoom_url: post_params[:zoom_url])
-    flash[:success] = 'Course was successfully created.' if @course.save
+    days, hours, zoom_url = params[:days].split(','), params[:hours], params[:zoom_url]
+    no_error = true
+    days.each do |day|
+      next if day.blank?
+      hours.each do |hour|
+        next if hour.blank?
+        time_slot = DateTime.parse("#{day} #{hour}")
+        course = current_user.teacher_profile.courses.new(time_slot: time_slot, zoom_url: zoom_url)
+        no_error &= course.save
+      end
+    end
+    flash[:success] = 'Courses were successfully created.' if no_error
     redirect_back fallback_location: root_path
   end
 
