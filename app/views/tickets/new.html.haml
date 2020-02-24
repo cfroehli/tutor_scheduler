@@ -1,6 +1,8 @@
 %h3.text-center Buy some tickets
 
 - if current_user.stripe_user_id
+  - content_for :packs, 'stripe'
+
   Stripe account enabled:
   = link_to dashboard_tickets_path do
     Show dashboard
@@ -15,27 +17,6 @@
               = "#{product[:name]}"
               %i.fas.fa-ticket-alt.fa-4x
               = "#{product[:price]}￥(+tax)"
-
-  - content_for :extra_js do
-    :javascript
-      $(window).ready(() => {
-        function stripe_checkout(stripe_session_id) {
-          var stripe = Stripe("#{Rails.configuration.stripe[:publishable_key]}");
-          stripe
-            .redirectToCheckout({ sessionId: stripe_session_id })
-            .then((result) => alert(result.error.message));
-        };
-
-        $("a[data-product]").on('click', (event) => {
-          fetch("#{checkout_tickets_path}/?product_id=" + event.currentTarget.dataset.product)
-            .then(response => response.json())
-            .then((json) => stripe_checkout(json.session_id));
-          event.returnValue = false;
-        });
-
-        $("#products").show();
-      });
-    %script{src: "https://js.stripe.com/v3/", defer: "true", 'data-turbolinks-track': "reload"}
 
 - else
   A Stripe account need to be connected to process your payment.

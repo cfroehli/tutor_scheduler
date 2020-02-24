@@ -1,0 +1,30 @@
+- content_for :packs, 'bootstrap-tempusdominus,bootstrap-table,tutor-scheduler-stats'
+- content_for :no_css_packs, 'tutor-scheduler-stats'
+
+.h3.text-center Courses heatmap
+
+= form_with do |f|
+  .form-group
+    .input-group.date#start_day_picker{data: {'target-input':"nearest", 'date-format': "YYYY-MM-DD"}}
+      = f.label :start_day, class: 'form-control col-sm-2'
+      = f.text_field :start_day, class: 'form-control datetimepicker-input', 'data-target': "#start_day_picker"
+      .input-group-append{data: {target: "#start_day_picker", toggle: "datetimepicker"}}
+        .input-group-text
+          %i.fas.fa-calendar
+
+  .form-group
+    .input-group.date#end_day_picker{data: {'target-input':"nearest", 'date-format': "YYYY-MM-DD"}}
+      = f.label :end_day, class: 'form-control col-sm-2'
+      = f.text_field :end_day, class: 'form-control datetimepicker-input', 'data-target': "#end_day_picker"
+      .input-group-append{data: {target: "#end_day_picker", toggle: "datetimepicker"}}
+        .input-group-text
+          %i.fas.fa-calendar
+
+%br/
+
+%table#stats{'data-url': courses_heatmap_stats_path, 'data-toggle': 'table'}
+  %thead
+    %tr.text-center
+      %th day \ hour
+      - (7..22).each do |hour|
+        %th{'data-formatter': 'stats_text_formatter', 'data-cell-style': 'stats_style_formatter'}= hour

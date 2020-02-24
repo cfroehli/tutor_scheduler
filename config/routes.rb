@@ -7,6 +7,9 @@ Rails.application.routes.draw do
     post :impersonate, on: :member
     post :stop_impersonating, on: :collection
   end
+  resources :stats, only: [:index] do
+    get 'courses_heatmap', constraints: {format: :json}, on: :collection
+  end
   resources :courses,
     path: '/courses(/lang/:language)(/teacher/:teacher)(/:year(/:month(/:day(/:hour))))',
     only: [:index],

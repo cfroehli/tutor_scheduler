@@ -1,6 +1,9 @@
 %h3.text-center Teacher profile
 
 - if @teacher
+  - content_for :packs, 'bootstrap-table,bootstrap-tempusdominus,tutor-scheduler-teachers'
+  - content_for :no_css_packs, 'tutor-scheduler-teachers'
+
   = render 'teacher', {teacher: @teacher}
 
   - if current_user.id == @teacher.user.id
@@ -20,7 +23,7 @@
         .input-group.date#day_picker{data: {'target-input':"nearest", 'date-format': "YYYY-MM-DD HH:00"}}
           = f.label :time_slot, class: 'form-control col-sm-2'
           = f.text_field :time_slot, class: 'form-control datetimepicker-input', 'data-target': "#day_picker"
-          .input-group-append{data: {target:"#day_picker", toggle:"datetimepicker"}}
+          .input-group-append{data: {target: "#day_picker", toggle: "datetimepicker"}}
             .input-group-text
               %i.fas.fa-calendar
 
@@ -53,26 +56,6 @@
           %th{'data-field':"language"} Language
           %th{'data-field':"student", 'data-formatter':'student_history_formatter'} Student
           %th{'data-field':"zoom_url"} Zoom
-
-    - content_for :extra_styles do
-      = stylesheet_pack_tag 'bootstrap-tempusdominus', media: 'all', 'data-turbolinks-track': 'reload'
-      = stylesheet_pack_tag 'bootstrap-table', media: 'all', 'data-turbolinks-track': 'reload'
-
-
-    - content_for :extra_js do
-      = javascript_pack_tag 'bootstrap-tempusdominus', 'data-turbolinks-track': 'reload', defer: true
-      :javascript
-        $(document).on('turbolinks:load', () => {
-          window.action_formatter = function action_formatter(value) {
-            return value.set_content_link + ' ' + value.set_feedback_link;
-          };
-          window.student_history_formatter = function student_history_formatter(value, row) {
-            if(row.student == '-')
-              return value;
-            return row.courses_history_link;
-          };
-        });
-      = javascript_pack_tag 'bootstrap-table', 'data-turbolinks-track': 'reload', defer: true
 
 - else
 

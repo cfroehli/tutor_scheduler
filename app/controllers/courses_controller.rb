@@ -39,6 +39,7 @@ class CoursesController < ApplicationController
   def create
     post_params = params.require(:course).permit(:time_slot, :zoom_url)
     time_slot = DateTime.parse(post_params[:time_slot])
+    # TODO: limit time slot values here
     @course = current_user.teacher_profile.courses.new(time_slot: time_slot, zoom_url: post_params[:zoom_url])
     flash[:success] = 'Course was successfully created.' if @course.save
     redirect_back fallback_location: root_path
