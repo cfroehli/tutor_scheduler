@@ -35,7 +35,6 @@ Rails.application.routes.draw do
       get 'checkout', format: :json
       get 'order_success'
       get 'order_cancel'
-      get 'dashboard'
     end
   end
   resources :teached_languages, only: [] do

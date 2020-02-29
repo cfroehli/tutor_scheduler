@@ -1,30 +1,27 @@
 %h3.text-center Buy some tickets
 
-- if current_user.stripe_user_id
-  - content_for :packs, 'stripe'
-  - content_for :no_css_packs, 'stripe'
-  - content_for :extra_js do
-    %script{src: "https://js.stripe.com/v3/", defer: "true", 'data-turbolinks-track': "reload"}
-    :javascript
-      window.CHECKOUT_TICKETS_PATH = "#{checkout_tickets_path}";
-      window.STRIPE_PUB_KEY = "#{Rails.configuration.stripe[:publishable_key]}";
+- content_for :packs, 'stripe'
+- content_for :no_css_packs, 'stripe'
+- content_for :extra_js do
+  %script{src: "https://js.stripe.com/v3/", defer: "true", 'data-turbolinks-track': "reload"}
 
-  Stripe account enabled:
-  = link_to dashboard_tickets_path do
-    Show dashboard
+#stripe{data: {'pub-key': "#{Rails.configuration.stripe[:publishable_key]}",
+               'email': "#{current_user.email}",
+               'id': "#{current_user.id}",
+               'success-url': order_success_tickets_url,
+               'cancel-url': order_cancel_tickets_url}}
 
-  #products{style: "display:none;"}
-    .row
-    - @products.each do |product|
-      .col-sm-4
-        %a{href: "#", 'data-product': "#{product[:id]}"}
-          %h2
-            .div
-              = "#{product[:name]}"
-              %i.fas.fa-ticket-alt.fa-4x
-              = "#{product[:price]}￥(+tax)"
-
-- else
-
-  A Stripe account need to be connected to process your payment.
-  = link_to image_pack_tag("stripe_button.png"), stripe_button_link
+#products{style: "display:none;"}
+  - @products.each do |product|
+    %a{href: "#", data: {'item-type': "product", 'item-id': "#{product[:id]}"}}
+      .card
+        .card-header
+          .float-left
+            %i.fas.fa-ticket-alt.fa-2x
+            #{product[:name]}
+          .float-right
+            = "#{product[:price]}￥(+tax)"
+          .clearfix
+        .card-body
+          = "Allow to reserve #{product[:hours]} x 1H course."
+    %br/
