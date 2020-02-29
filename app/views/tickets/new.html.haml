@@ -2,8 +2,6 @@
 
 - content_for :packs, 'stripe'
 - content_for :no_css_packs, 'stripe'
-- content_for :extra_js do
-  %script{src: "https://js.stripe.com/v3/", defer: "true", 'data-turbolinks-track': "reload"}
 
 #stripe{data: {'pub-key': "#{Rails.configuration.stripe[:publishable_key]}",
                'email': "#{current_user.email}",

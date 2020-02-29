@@ -71,10 +71,8 @@ class StripeController < ApplicationController
     checkout_session.display_items.each do |item|
       next unless item.type == 'sku'
       user.tickets += item.sku.attributes.lot_size.to_i
+      user.save
     end
-
-    user.save
-
     :accepted
   end
 end
