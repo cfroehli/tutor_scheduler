@@ -3,13 +3,20 @@
     %i.fa.fa-user
     = "#{current_user.username}'s dashboard"
   .card-body
-    .card-text      
-      - if current_user.tickets == 0
-        Refill
-      - else
-        = "Remaining tickets: #{current_user.tickets}"
+    .card-text
+      - remaining_tickets = current_user.remaining_tickets
+      - if remaining_tickets == 0
+        No ticket available : 
         = link_to new_ticket_path do
-          (Buy more)
+          Buy a few tickets here.
+      - else
+        = "Remaining tickets: #{remaining_tickets}"
+        %ul
+        - current_user.tickets_validity.each do |expiration, remaining|
+          - if expiration.nil?
+            %li= "#{remaining} tickets without any date limit"
+          - else
+            %li= "#{remaining} tickets to use before #{expiration}"                   
 
     - unless current_user.teacher_profile.nil?
       %hr/    

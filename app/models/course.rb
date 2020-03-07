@@ -1,4 +1,6 @@
 class Course < ApplicationRecord
+  class << self; undef :open; end
+
   belongs_to :teacher
   belongs_to :language, required: false, default: nil
   belongs_to :student, class_name: 'User', required: false, default: nil

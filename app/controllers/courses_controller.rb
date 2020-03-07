@@ -90,8 +90,7 @@ class CoursesController < ApplicationController
       course.language = Language.find(params[:language_id])
       course.save
 
-      current_user.tickets -= 1
-      current_user.save
+      current_user.use_ticket
     end
 
     CourseMailer.sign_up(course).deliver_later

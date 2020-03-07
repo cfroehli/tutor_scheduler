@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_18_090756) do
+ActiveRecord::Schema.define(version: 2020_03_14_033329) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -49,13 +49,23 @@ ActiveRecord::Schema.define(version: 2020_02_18_090756) do
 
   create_table "teachers", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.string "name", null: false
+    t.string "name", limit: 20, null: false
     t.string "image"
     t.string "presentation"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["user_id"], name: "index_teachers_on_user_id"
     t.index ["name"], name: "index_teachers_on_name", unique: true
+    t.index ["user_id"], name: "index_teachers_on_user_id"
+  end
+
+  create_table "tickets", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.datetime "expiration"
+    t.integer "initial_count", default: 0, null: false
+    t.integer "remaining", default: 0, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_tickets_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -68,8 +78,9 @@ ActiveRecord::Schema.define(version: 2020_02_18_090756) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "username", limit: 20, null: false
     t.boolean "admin", default: false, null: false
-    t.integer "tickets", default: 0, null: false
     t.string "stripe_user_id"
+    t.string "stripe_plan_id"
+    t.string "stripe_subscription_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["username"], name: "index_users_on_username", unique: true
@@ -80,4 +91,5 @@ ActiveRecord::Schema.define(version: 2020_02_18_090756) do
   add_foreign_key "courses", "users", column: "student_id"
   add_foreign_key "teached_languages", "languages"
   add_foreign_key "teached_languages", "teachers"
+  add_foreign_key "tickets", "users"
 end

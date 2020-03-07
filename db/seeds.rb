@@ -204,8 +204,14 @@ end
 
 u = User.find_by(username: 'toto')
 if u.nil?
-  u = User.new(username: 'toto', email: 'toto@hazeliris.com', password: 'totopass', tickets: 10, admin: true)
+  u = User.new(username: 'toto', email: 'toto@hazeliris.com', password: 'totopass', admin: true)
   u.save
+
+  t = u.tickets.new(initial_count: 10, remaining: 10)
+  t.save
+
+  t = u.tickets.new(initial_count: 10, remaining: 10, expiration: Date.today + 3.weeks)
+  t.save
 end
 
 t = Teacher.find_by(user_id: u.id)
@@ -229,6 +235,12 @@ end
 
 u = User.find_by(username: 'titi')
 if u.nil?
-  u = User.new(username: 'titi', email: 'titi@hazeliris.com', password: 'titipass', tickets: 10)
+  u = User.new(username: 'titi', email: 'titi@hazeliris.com', password: 'titipass')
   u.save
+
+  t = u.tickets.new(initial_count: 10, remaining: 10)
+  t.save
+
+  t = u.tickets.new(initial_count: 10, remaining: 10, expiration: Date.today + 3.days)
+  t.save
 end

@@ -3,23 +3,29 @@
 - content_for :packs, 'stripe'
 - content_for :no_css_packs, 'stripe'
 
-#stripe{data: {'pub-key': "#{Rails.configuration.stripe[:publishable_key]}",
-               'email': "#{current_user.email}",
-               'id': "#{current_user.id}",
-               'success-url': order_success_tickets_url,
-               'cancel-url': order_cancel_tickets_url}}
+#stripe{data: {'new-url': new_stripe_path}}
 
 #products{style: "display:none;"}
-  - @products.each do |product|
-    %a{href: "#", data: {'item-type': "product", 'item-id': "#{product[:id]}"}}
+  - current_plan = current_user.stripe_plan_id
+  - unless current_plan.nil?
+    %a{href: "#", data: {'stripe-item-id': "#{current_plan}", 'stripe-item-type': "cancel"}}
+      .card
+        .card-header
+          %i.fas.fa-ticket-alt.fa-2x
+          Cancel current plan
+    %br/
+
+  - StripeController.available_products.each do |product|
+    - next if (not current_plan.nil? and (product[:type] == :subscription))
+    %a{href: "#", data: {'stripe-item-id': "#{product[:id]}", 'stripe-item-type': "#{product[:type]}"}}
       .card
         .card-header
           .float-left
             %i.fas.fa-ticket-alt.fa-2x
-            #{product[:name]}
+            = product[:name]
           .float-right
-            = "#{product[:price]}￥(+tax)"
+            = product[:price]
           .clearfix
         .card-body
-          = "Allow to reserve #{product[:hours]} x 1H course."
+          = product[:description]
     %br/

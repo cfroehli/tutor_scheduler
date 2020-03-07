@@ -30,10 +30,13 @@
             = link_to root_path, class: 'nav-item nav-link' do
               %i.fas.fa-tachometer-alt
               Dashboard
-            = link_to courses_path, class: 'nav-item nav-link' do
-              %i.fas.fa-user-graduate
-              Learning
             - if user_signed_in?
+              = link_to new_ticket_path, class: 'nav-item nav-link' do
+                %i.fas.fa-ticket-alt
+                Tickets
+              = link_to courses_path, class: 'nav-item nav-link' do
+                %i.fas.fa-user-graduate
+                Learning
               - unless current_user.teacher_profile.nil?
                 = link_to teacher_path(current_user.teacher_profile), class: 'nav-item nav-link' do
                   %i.fas.fa-school

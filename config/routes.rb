@@ -50,11 +50,9 @@ Rails.application.routes.draw do
       get 'future_courses'
     end
   end
-  resources :stripe, only: [] do
-    collection do
-      get 'connect'
-      post 'on_event'
-    end
+  resources :stripe, only: [ :new, :create ] do
+    post 'on_event', on: :collection
+    post 'cancel_subscription', on: :collection
   end
   root to: "users#dashboard"
 end

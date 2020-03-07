@@ -1,9 +1,10 @@
 %h3.text-center Sign up for a course
 
-= "Remaining tickets : #{current_user.tickets}"
+- remaining_tickets = current_user.remaining_tickets
+= "Remaining tickets : #{remaining_tickets}"
 
 %hr/
-- if current_user.tickets > 0
+- if remaining_tickets > 0
   - if @years.empty?
     - if @year
       %span &#47;
