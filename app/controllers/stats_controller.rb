@@ -2,7 +2,8 @@ class StatsController < ApplicationController
   def courses_hourly
     start_date = Date.parse(params[:start_date]).beginning_of_day()
     end_date = Date.parse(params[:end_date]).end_of_day()
-    courses = Course.where(time_slot: start_date..end_date) unless (start_date.blank? or end_date.blank?)
+    courses = Course.all
+    courses = courses.where(time_slot: start_date..end_date) unless (start_date.blank? or end_date.blank?)
     courses = courses.group('extract(dow from time_slot)::integer',
                             'extract(hour from time_slot)::integer')
     days = [[0, "S"], [1, "M"], [2, "T"], [3, "W"], [4, "T"], [5, "F"], [6, "S"]]
