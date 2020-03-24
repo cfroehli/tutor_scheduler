@@ -6,6 +6,7 @@
   .card-header User impersonation
   .card-body
     - User.order(:id).each do |user|
+      - next if user == current_user
       .card-text
         Sign in as
         = link_to user.username, impersonate_admin_path(user), method: :post

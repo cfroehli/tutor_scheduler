@@ -38,7 +38,7 @@ environment.config.merge({
     runtimeChunk: 'single',
     splitChunks: {
       chunks: 'all',
-        maxInitialRequests: Infinity,
+      maxInitialRequests: Infinity,
       minSize: 0,
       cacheGroups: {
         vendor: {
