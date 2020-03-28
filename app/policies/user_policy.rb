@@ -1,5 +1,5 @@
 class UserPolicy < ApplicationPolicy
   def impersonate?
-    @user.admin?
+    @user.has_role? :admin
   end
 end

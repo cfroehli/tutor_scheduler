@@ -1,9 +1,9 @@
 class TeachedLanguagePolicy < ApplicationPolicy
   def activate?
-    @user.admin?
+    @user.has_role? :admin
   end
 
   def deactivate?
-    @user.admin?
+    @user.has_role? :admin
   end
 end

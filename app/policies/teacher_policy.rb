@@ -1,9 +1,9 @@
 class TeacherPolicy < ApplicationPolicy
   def update?
-    @record.user.id == @user.id || @user.admin?
+    @record.user.id == @user.id || @user.has_role? :admin
   end
 
   def add_language?
-    @user.admin?
+    @user.has_role? :admin
   end
 end

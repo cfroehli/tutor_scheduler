@@ -1,4 +1,5 @@
 class User < ApplicationRecord
+  rolify
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable, :recoverable, :rememberable, :validatable
@@ -14,8 +15,12 @@ class User < ApplicationRecord
   attr_writer :login
 
   after_create do
+    # New user got free tickets to try our service
     new_account_free_ticket = self.tickets.new(initial_count: 1, remaining: 1)
     new_account_free_ticket.save
+
+    # Default to 'user' role
+    self.add_role(:user) if self.roles.blank?
   end
 
   def login

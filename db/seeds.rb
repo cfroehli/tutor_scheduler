@@ -204,7 +204,8 @@ end
 
 u = User.find_by(username: 'toto')
 if u.nil?
-  u = User.new(username: 'toto', email: 'toto@hazeliris.com', password: 'totopass', admin: true)
+  u = User.new(username: 'toto', email: 'toto@hazeliris.com', password: 'totopass')
+  u.add_role :admin
   u.save
 
   t = u.tickets.new(initial_count: 10, remaining: 10)

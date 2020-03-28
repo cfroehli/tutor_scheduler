@@ -41,7 +41,7 @@
                 = link_to teacher_path(current_user.teacher_profile), class: 'nav-item nav-link' do
                   %i.fas.fa-school
                   Teaching
-              - if current_user.admin?
+              - if current_user.has_role? :admin
                 = link_to admin_index_path, class: 'nav-item nav-link' do
                   %i.fas.fa-user-shield
                   Admin
