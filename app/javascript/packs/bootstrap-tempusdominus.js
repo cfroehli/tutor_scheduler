@@ -1,6 +1,5 @@
 import $ from 'jquery';
 
-import 'css/bootstrap-tempusdominus.scss';
 import 'tempusdominus-bootstrap-4';
 
 $(document).on("turbolinks:load", function() {

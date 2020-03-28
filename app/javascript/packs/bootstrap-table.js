@@ -1,6 +1,5 @@
 import $ from 'jquery';
 
-import 'css/bootstrap-table.scss';
 import 'bootstrap-table';
 
 $(document).on("turbolinks:load", function() {

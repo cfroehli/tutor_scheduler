@@ -1,6 +1,5 @@
 import $ from 'jquery';
 
-import 'css/bootstrap-multiselect.scss';
 import 'bootstrap-multiselect';
 
 $(document).on('turbolinks:load', function() {
