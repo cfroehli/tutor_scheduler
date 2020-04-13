@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CourseMailer < ApplicationMailer
   def sign_up(course)
     @course = course

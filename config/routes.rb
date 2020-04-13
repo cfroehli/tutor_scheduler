@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 Rails.application.routes.draw do
-  devise_for :users, path: 'auth', path_names: {sign_in: 'login', sign_out: 'logout', sign_up: 'register'}
+  devise_for :users, path: 'auth', path_names: { sign_in: 'login', sign_out: 'logout', sign_up: 'register' }
   resources :users, only: [] do
     get 'courses_history', on: :member
   end
@@ -18,19 +20,19 @@ Rails.application.routes.draw do
       get 'courses_language_weekly', format: :json
     end
   end
-  resources :courses, only: [:index, :create, :edit, :update] do
+  resources :courses, only: %i[index create edit update] do
     post 'sign_up', on: :member
     get '(/lang/:language)(/teacher/:teacher)(/:year(/:month(/:day(/:hour))))',
-      to: 'courses#index',
-      on: :collection,
-      language: /\w+/,
-      teacher: /\w+/,
-      year: /\d+/,
-      month: /\d+/,
-      day: /\d+/,
-      hour: /\d+/
+        to: 'courses#index',
+        on: :collection,
+        language: /\w+/,
+        teacher: /\w+/,
+        year: /\d+/,
+        month: /\d+/,
+        day: /\d+/,
+        hour: /\d+/
   end
-  resources :tickets, only: [:new, :create] do
+  resources :tickets, only: %i[new create] do
     collection do
       get 'checkout', format: :json
       get 'order_success'
@@ -50,9 +52,9 @@ Rails.application.routes.draw do
       get 'future_courses'
     end
   end
-  resources :stripe, only: [ :new, :create ] do
+  resources :stripe, only: %i[new create] do
     post 'on_event', on: :collection
     post 'cancel_subscription', on: :collection
   end
-  root to: "users#dashboard"
+  root to: 'users#dashboard'
 end

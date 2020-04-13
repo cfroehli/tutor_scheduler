@@ -1,14 +1,16 @@
+# frozen_string_literal: true
+
 class User < ApplicationRecord
   rolify
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable, :recoverable, :rememberable, :validatable
 
-  validates :username, presence: :true, uniqueness: { case_sensitive: false }, length: { minimum: 1, maximum: 20 }
-  validates_format_of :username, with: /\A[a-zA-Z0-9_\.]+\z/
+  validates :username, presence: true, uniqueness: { case_sensitive: false },
+                       length: { minimum: 1, maximum: 20 }, format: /\A[a-zA-Z0-9_\.]+\z/
 
   has_one :teacher_profile, class_name: 'Teacher'
-  has_many :courses, foreign_key: 'student_id'
+  has_many :courses, foreign_key: 'student_id', inverse_of: :student
 
   has_many :tickets
 
@@ -16,46 +18,44 @@ class User < ApplicationRecord
 
   after_create do
     # New user got free tickets to try our service
-    new_account_free_ticket = self.tickets.new(initial_count: 1, remaining: 1)
+    new_account_free_ticket = tickets.new(initial_count: 1, remaining: 1)
     new_account_free_ticket.save
 
     # Default to 'user' role
-    self.add_role(:user) if self.roles.blank?
+    add_role(:user) if roles.blank?
   end
 
   def login
-    @login || self.username || self.email
+    @login || username || email
   end
 
   def self.find_first_by_auth_conditions(warden_conditions)
     conditions = warden_conditions.dup
-    if login = conditions.delete(:login)
-      where(conditions).where(["lower(username) = :value OR lower(email) = :value", { value: login.downcase }]).first
+    if (login = conditions.delete(:login))
+      where(conditions).find_by(['lower(username) = :value OR lower(email) = :value', { value: login.downcase }])
+    elsif conditions[:username].nil?
+      find_by(conditions)
     else
-      if conditions[:username].nil?
-        where(conditions).first
-      else
-        where(username: conditions[:username]).first
-      end
+      find_by(username: conditions[:username])
     end
   end
 
-  def use_ticket(ticket_count=1)
-    ticket = self.tickets.valid.order("expiration ASC NULLS LAST").first
+  def use_ticket(ticket_count = 1)
+    ticket = tickets.valid.order('expiration ASC NULLS LAST').first
     ticket.remaining -= ticket_count
     ticket.save
   end
 
-  def add_tickets(ticket_count, expiration=nil)
-    tickets = self.tickets.new(initial_count: ticket_count, remaining: ticket_count, expiration: expiration)
-    tickets.save
+  def add_tickets(ticket_count, expiration = nil)
+    new_tickets = tickets.new(initial_count: ticket_count, remaining: ticket_count, expiration: expiration)
+    new_tickets.save
   end
 
   def remaining_tickets
-    self.tickets.valid.sum('remaining')
+    tickets.valid.sum('remaining')
   end
 
   def tickets_validity
-    self.tickets.valid.group(:expiration).order(expiration: :desc).pluck(:expiration, 'SUM(remaining)')
+    tickets.valid.group(:expiration).order(expiration: :desc).pluck(:expiration, 'SUM(remaining)')
   end
 end

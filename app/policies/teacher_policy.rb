@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TeacherPolicy < ApplicationPolicy
   def update?
     @record.user.id == @user.id || @user.has_role?(:admin)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateTickets < ActiveRecord::Migration[6.0]
   def change
     rename_column :users, :tickets, :old_tickets
@@ -12,13 +14,12 @@ class CreateTickets < ActiveRecord::Migration[6.0]
     end
 
     User.all.each do |user|
-      if user.old_tickets > 0
+      if user.old_tickets.positive?
         ticket = user.tickets.new(initial_count: user.tickets, remaining: user.tickets)
         ticket.save
       end
     end
 
     remove_column :users, :old_tickets
-
   end
 end

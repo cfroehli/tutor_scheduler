@@ -1,11 +1,21 @@
+# frozen_string_literal: true
+
 class CoursesController < ApplicationController
   respond_to :html, :json
 
   def index
-    @years, @months, @days, @courses = [], [], [], {}
-    @year, @month, @day = params[:year], params[:month], params[:day]
+    @years   = []
+    @months  = []
+    @days    = []
+    @courses = []
 
-    @lang_code, @teacher_name = params[:language], params[:teacher]
+    @year = params[:year]
+    @month = params[:month]
+    @day = params[:day]
+
+    @lang_code = params[:language]
+    @teacher_name = params[:teacher]
+
     teacher = Teacher.find_by(name: @teacher_name) unless @teacher_name.nil?
     language = Language.find_by(code: @lang_code) unless @lang_code.nil?
 
@@ -18,7 +28,7 @@ class CoursesController < ApplicationController
       if @month
         if @day
           @courses = Hash.new { |h, k| h[k] = [] }
-          courses.on_day(@year.to_i, @month.to_i, @day.to_i).each do | course |
+          courses.on_day(@year.to_i, @month.to_i, @day.to_i).each do |course|
             @courses[course.time_slot.hour].push(course)
           end
         else
@@ -37,12 +47,17 @@ class CoursesController < ApplicationController
   end
 
   def create
-    days, hours, zoom_url = params[:days].split(','), params[:hours], params[:zoom_url]
+    days = params[:days].split(',')
+    hours = params[:hours]
+    zoom_url = params[:zoom_url]
+
     no_error = true
     days.each do |day|
       next if day.blank?
+
       hours.each do |hour|
         next if hour.blank?
+
         time_slot = DateTime.parse("#{day} #{hour}")
         course = current_user.teacher_profile.courses.new(time_slot: time_slot, zoom_url: zoom_url)
         no_error &= course.save
@@ -61,9 +76,7 @@ class CoursesController < ApplicationController
     course = find_course
     if course.update(post_params)
       flash[:success] = 'Course was successfully updated.'
-      if course.feedback_changed?
-        CourseMailer.notify_feedback_update(course).deliver_later
-      end
+      CourseMailer.notify_feedback_update(course).deliver_later if course.feedback_changed?
     end
     redirect_back fallback_location: root_path
   end
@@ -72,16 +85,16 @@ class CoursesController < ApplicationController
     course = find_course
 
     teacher_profile = current_user.teacher_profile
-    if !teacher_profile.nil?
+    unless teacher_profile.nil?
       if teacher_profile.id == course.teacher.id
-        flash[:info] = "Unable to sign up for your own course."
-        redirect_back fallback_location: root_path and return
+        flash[:info] = 'Unable to sign up for your own course.'
+        redirect_back fallback_location: root_path && return
       end
 
       teaching_slot = teacher_profile.courses.where(time_slot: course.time_slot)
-      if !teaching_slot.empty?
-        flash[:info] = "Unable to sign up : You already have a teaching slot registered at the same time."
-        redirect_back fallback_location: root_path and return
+      unless teaching_slot.empty?
+        flash[:info] = 'Unable to sign up : You already have a teaching slot registered at the same time.'
+        redirect_back fallback_location: root_path && return
       end
     end
 
@@ -96,11 +109,12 @@ class CoursesController < ApplicationController
     CourseMailer.sign_up(course).deliver_later
     CourseMailer.reservation(course).deliver_later
 
-    flash[:success] = "Signed up for a [#{course.language.name}] course with [#{course.teacher.user.username}] at [#{course.time_slot}]."
+    flash[:success] = "Signed up for a [#{course.language.name}] course with [#{course.teacher.user.username}] at [#{course.time_slot}]." # rubocop:disable Layout/LineLength
     redirect_to courses_path
   end
 
   private
+
   def find_course
     Course.find(params[:id])
   end

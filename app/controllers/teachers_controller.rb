@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TeachersController < ApplicationController
   respond_to :html, :json
 
@@ -32,7 +34,8 @@ class TeachersController < ApplicationController
 
   def add_language
     authorize Teacher
-    user_id, language_id = params[:user], params[:language]
+    user_id = params[:user]
+    language_id = params[:language]
     user = User.find(user_id)
     if user.teacher_profile.nil?
       user.teacher_profile = Teacher.new(user: user, name: user.username, presentation: 'Present yourself here...')
@@ -45,7 +48,7 @@ class TeachersController < ApplicationController
       teached_language = TeachedLanguage.new(teacher: teacher, language: language)
       flash[:success] = "Language #{language.name} added to teacher #{teacher.name}." if teached_language.save
     else
-      flash[:info] = "Language #{teached_language.language.name} already available for teacher #{teached_language.teacher.name}."
+      flash[:info] = "Language #{teached_language.language.name} already available for teacher #{teached_language.teacher.name}." # rubocop:disable Layout/LineLength
     end
     redirect_back fallback_location: root_path
   end
@@ -53,8 +56,8 @@ class TeachersController < ApplicationController
   def action_required_courses
     order = params[:order] == 'asc' ? :asc : :desc
     @courses = current_user.teacher_profile.courses
-      .action_required
-      .order(time_slot: order)
+                           .action_required
+                           .order(time_slot: order)
   end
 
   def future_courses
@@ -63,6 +66,7 @@ class TeachersController < ApplicationController
   end
 
   private
+
   def post_params
     params.require(:teacher).permit(:language_id, :name, :presentation, :image, :image_cache)
   end

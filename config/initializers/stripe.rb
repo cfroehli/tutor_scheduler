@@ -1,4 +1,4 @@
-#require 'stripe'
+# frozen_string_literal: true
 
 Rails.configuration.stripe = {
   publishable_key: ENV['STRIPE_PUB_KEY'],

@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 class Course < ApplicationRecord
   class << self; undef :open; end
 
   belongs_to :teacher
-  belongs_to :language, required: false, default: nil
-  belongs_to :student, class_name: 'User', required: false, default: nil
+  belongs_to :language, optional: true, default: nil
+  belongs_to :student, class_name: 'User', optional: true, default: nil
 
   scope :with_teacher, ->(teacher) { where(teacher: teacher) }
   scope :with_student, ->(student) { where(student: student) }

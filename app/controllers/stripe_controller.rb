@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'ostruct'
 
 class StripeController < ApplicationController
@@ -30,9 +32,10 @@ class StripeController < ApplicationController
   end
 
   def create
-    item_type, item_id = params['stripeItemType'], params['stripeItemId']
+    item_type = params['stripeItemType']
+    item_id = params['stripeItemId']
 
-    unless current_user.stripe_subscription_id.blank?
+    if current_user.stripe_subscription_id.present?
       if current_user.stripe_plan_id == item_id
         @session = OpenStruct.new({ id: nil, msg: 'This plan is already active' })
         return
@@ -52,23 +55,23 @@ class StripeController < ApplicationController
     when :product
       stripe_sku = Stripe::SKU.retrieve(item_id)
       session_data.merge!({
-        mode: 'payment',
-        line_items: [{
-          name: stripe_sku.attributes[:name],
-          amount: stripe_sku[:price],
-          description: "Can be used to reserve #{stripe_sku.attributes[:lot_size]}x1H course",
-          currency: 'jpy',
-          quantity: 1
-        }],
-        metadata: { lot_size: stripe_sku.attributes[:lot_size] }
-      })
+                            mode: 'payment',
+                            line_items: [{
+                              name: stripe_sku.attributes[:name],
+                              amount: stripe_sku[:price],
+                              description: "Can be used to reserve #{stripe_sku.attributes[:lot_size]}x1H course",
+                              currency: 'jpy',
+                              quantity: 1
+                            }],
+                            metadata: { lot_size: stripe_sku.attributes[:lot_size] }
+                          })
     when :subscription
       stripe_plan = Stripe::Plan.retrieve(item_id)
       session_data.merge!({
-        mode: 'subscription',
-        subscription_data: { items: [{ plan: stripe_plan.id, quantity: 1 }] },
-        metadata: { lot_size: stripe_plan.metadata[:lot_size] }
-      })
+                            mode: 'subscription',
+                            subscription_data: { items: [{ plan: stripe_plan.id, quantity: 1 }] },
+                            metadata: { lot_size: stripe_plan.metadata[:lot_size] }
+                          })
     end
 
     if current_user.stripe_user_id.blank?
@@ -86,71 +89,80 @@ class StripeController < ApplicationController
 
   def self.setup_products
     product = Stripe::Product.create({
-      name: 'Course ticket',
-      type: 'good',
-      shippable: false,
-      description: "Can be used to reserve 1H course",
-      attributes: [ 'name', 'lot_size' ]
-    })
-    [ [ '1 Ticket'        , 1, 2000 ],
-      [ '3 Tickets Bundle', 3, 5000 ],
-      [ '5 Tickets Bundle', 5, 7500 ] ].each do |name, hours, price|
+                                       name: 'Course ticket',
+                                       type: 'good',
+                                       shippable: false,
+                                       description: 'Can be used to reserve 1H course',
+                                       attributes: %w[name lot_size]
+                                     })
+    [['1 Ticket',         1, 2000],
+     ['3 Tickets Bundle', 3, 5000],
+     ['5 Tickets Bundle', 5, 7500]].each do |name, hours, price|
       Stripe::SKU.create({
-        product: product.id,
-        price: price,
-        currency: 'jpy',
-        inventory: { type: 'infinite' },
-        attributes: { name: name, lot_size: hours }
-      })
+                           product: product.id,
+                           price: price,
+                           currency: 'jpy',
+                           inventory: { type: 'infinite' },
+                           attributes: { name: name, lot_size: hours }
+                         })
     end
     product = Stripe::Product.create({
-      name: 'Plan ticket',
-      type: 'service',
-      description: "Can be used to reserve 1H course",
-    })
-    [ [ '5 Tickets' , 'Light'   , 5 ,  7000 ],
-      [ '7 Tickets' , 'Standard', 7 ,  9500 ],
-      [ '10 Tickets', 'Heavy'   , 10, 12000 ] ].each do |name, plan, hours, price|
+                                       name: 'Plan ticket',
+                                       type: 'service',
+                                       description: 'Can be used to reserve 1H course'
+                                     })
+    [['5 Tickets',   5,  7_000],
+     ['7 Tickets',   7,  9_500],
+     ['10 Tickets', 10, 12_000]].each do |name, hours, price|
       Stripe::Plan.create({
-        nickname: "#{name} per month",
-        interval: 'month',
-        currency: 'jpy',
-        amount: price,
-        product: product.id,
-        metadata: { lot_size: hours }
-      })
+                            nickname: "#{name} per month",
+                            interval: 'month',
+                            currency: 'jpy',
+                            amount: price,
+                            product: product.id,
+                            metadata: { lot_size: hours }
+                          })
     end
   end
 
   def self.available_products
     [
-      *Stripe::SKU.list()
-        .map { |sku| {
-          id: sku.id,
-          type: :product,
-          name: sku.attributes.name,
-          price: "#{sku.price}￥ (+税)",
-          description: "Allow to reserve #{sku.attributes.lot_size} x 1H course." } },
-      *Stripe::Plan.list()
-        .map { |plan| {
-          id: plan.id,
-          type: :subscription,
-          name: plan.nickname,
-          price: "#{plan.amount}￥",
-          description: "Allow to reserve #{plan.metadata[:lot_size]} x 1H course. Automatically renewed, unused tickets are lost at the end of the period." } }
+      *Stripe::SKU
+        .list
+        .map do |sku|
+          {
+            id: sku.id,
+            type: :product,
+            name: sku.attributes.name,
+            price: "#{sku.price}￥ (+税)",
+            description: "Allow to reserve #{sku.attributes.lot_size} x 1H course."
+          }
+        end,
+      *Stripe::Plan
+        .list
+        .map do |plan|
+          {
+            id: plan.id,
+            type: :subscription,
+            name: plan.nickname,
+            price: "#{plan.amount}￥",
+            description: "Allow to reserve #{plan.metadata[:lot_size]} x 1H course. Automatically renewed, unused tickets are lost at the end of the period." # rubocop:disable Layout/LineLength
+          }
+        end
     ]
   end
 
   private
+
   def _do_cancel_subscription
     current_subscription = current_user.stripe_subscription_id
-    unless current_subscription.blank?
-      Stripe::Subscription.delete(current_subscription)
+    return if current_subscription.present?
 
-      current_user.stripe_plan_id = nil
-      current_user.stripe_subscription_id = nil
-      current_user.save
-    end
+    Stripe::Subscription.delete(current_subscription)
+
+    current_user.stripe_plan_id = nil
+    current_user.stripe_subscription_id = nil
+    current_user.save
   end
 
   def handle_checkout_session_completed(checkout_session)
@@ -178,7 +190,7 @@ class StripeController < ApplicationController
 
     ticket_count = item.plan.metadata[:lot_size].to_i
     expiration = item.period[:end]
-    expiration = Time.at(expiration) unless expiration.nil?
+    expiration = Time.zone.at(expiration) unless expiration.nil?
     user.add_tickets(ticket_count, expiration)
 
     :accepted

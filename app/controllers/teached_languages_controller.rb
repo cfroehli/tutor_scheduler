@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TeachedLanguagesController < ApplicationController
   def activate
     authorize TeachedLanguage
@@ -12,8 +14,9 @@ class TeachedLanguagesController < ApplicationController
   end
 
   private
+
   def change_active_state(new_active_state)
     teached_language = TeachedLanguage.find(params[:id])
-    teached_language.update_attribute(:active, new_active_state)
+    teached_language.update(:active, new_active_state)
   end
 end
