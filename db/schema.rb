@@ -34,6 +34,8 @@ ActiveRecord::Schema.define(version: 2020_03_28_015924) do
   create_table "languages", force: :cascade do |t|
     t.string "code", limit: 2
     t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
     t.index ["code"], name: "index_languages_on_code", unique: true
     t.index ["name"], name: "index_languages_on_name", unique: true
   end

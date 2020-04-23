@@ -3,8 +3,9 @@
 class TeachersController < ApplicationController
   respond_to :html, :json
 
+  before_action :set_teacher, only: %i[show edit update]
+
   def show
-    @teacher = find_teacher
     @course = Course.new
   end
 
@@ -21,12 +22,10 @@ class TeachersController < ApplicationController
   end
 
   def edit
-    @teacher = find_teacher
     authorize @teacher
   end
 
   def update
-    @teacher = find_teacher
     authorize @teacher
     flash[:success] = 'Teacher profile was successfully updated.' if @teacher.update(post_params)
     respond_with @teacher
@@ -71,7 +70,7 @@ class TeachersController < ApplicationController
     params.require(:teacher).permit(:language_id, :name, :presentation, :image, :image_cache)
   end
 
-  def find_teacher
-    Teacher.find(params[:id])
+  def set_teacher
+    @teacher = Teacher.find(params[:id])
   end
 end

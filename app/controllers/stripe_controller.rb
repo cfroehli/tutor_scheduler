@@ -6,6 +6,8 @@ class StripeController < ApplicationController
   skip_before_action :verify_authenticity_token, only: [:on_event]
   skip_before_action :authenticate_user!, only: [:on_event]
 
+  before_action :ensure_new_subscription_required, only: %i[create]
+
   def on_event
     sig_header = request.env['HTTP_STRIPE_SIGNATURE']
 
@@ -34,15 +36,6 @@ class StripeController < ApplicationController
   def create
     item_type = params['stripeItemType']
     item_id = params['stripeItemId']
-
-    if current_user.stripe_subscription_id.present?
-      if current_user.stripe_plan_id == item_id
-        @session = OpenStruct.new({ id: nil, msg: 'This plan is already active' })
-        return
-      else
-        _do_cancel_subscription
-      end
-    end
 
     session_data = {
       client_reference_id: current_user.id,
@@ -153,6 +146,17 @@ class StripeController < ApplicationController
   end
 
   private
+
+  def ensure_new_subscription_required
+    return if current_user.stripe_subscription_id.blank?
+
+    if current_user.stripe_plan_id == params['stripeItemId']
+      @session = OpenStruct.new({ id: nil, msg: 'This plan is already active' })
+      render :create
+    end
+
+    _do_cancel_subscription
+  end
 
   def _do_cancel_subscription
     current_subscription = current_user.stripe_subscription_id

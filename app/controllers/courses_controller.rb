@@ -3,6 +3,9 @@
 class CoursesController < ApplicationController
   respond_to :html, :json
 
+  before_action :set_course, only: %i[show edit update sign_up]
+  before_action :ensure_slot_allowed, only: %i[sign_up]
+
   def index
     @years   = []
     @months  = []
@@ -13,15 +16,20 @@ class CoursesController < ApplicationController
     @month = params[:month]
     @day = params[:day]
 
-    @lang_code = params[:language]
-    @teacher_name = params[:teacher]
-
-    teacher = Teacher.find_by(name: @teacher_name) unless @teacher_name.nil?
-    language = Language.find_by(code: @lang_code) unless @lang_code.nil?
-
     courses = Course.all
-    courses = courses.with_language(language) unless language.nil?
-    courses = courses.with_teacher(teacher) unless teacher.nil?
+
+    @lang_code = params[:language]
+    if @lang_code.present?
+      language = Language.find_by(code: @lang_code)
+      courses = courses.with_language(language) unless language.nil?
+    end
+
+    @teacher_name = params[:teacher]
+    if @teacher_name.present?
+      teacher = Teacher.find_by(name: @teacher_name)
+      courses = courses.with_teacher(teacher) unless teacher.nil?
+    end
+
     courses = courses.available
 
     if @year
@@ -43,7 +51,6 @@ class CoursesController < ApplicationController
   end
 
   def show
-    @course = find_course
   end
 
   def create
@@ -68,54 +75,52 @@ class CoursesController < ApplicationController
   end
 
   def edit
-    @course = find_course
   end
 
   def update
     post_params = params.require(:course).permit(:zoom_url, :content, :feedback)
-    course = find_course
-    if course.update(post_params)
+    if @course.update(post_params)
       flash[:success] = 'Course was successfully updated.'
-      CourseMailer.notify_feedback_update(course).deliver_later if course.feedback_changed?
+      CourseMailer.notify_feedback_update(@course).deliver_later if course.feedback_changed?
     end
     redirect_back fallback_location: root_path
   end
 
   def sign_up
-    course = find_course
-
-    teacher_profile = current_user.teacher_profile
-    unless teacher_profile.nil?
-      if teacher_profile.id == course.teacher.id
-        flash[:info] = 'Unable to sign up for your own course.'
-        redirect_back fallback_location: root_path && return
-      end
-
-      teaching_slot = teacher_profile.courses.where(time_slot: course.time_slot)
-      unless teaching_slot.empty?
-        flash[:info] = 'Unable to sign up : You already have a teaching slot registered at the same time.'
-        redirect_back fallback_location: root_path && return
-      end
-    end
-
     Course.transaction do
-      course.student = current_user
-      course.language = Language.find(params[:language_id])
-      course.save
+      @course.student = current_user
+      @course.language = Language.find(params[:language_id])
+      @course.save
 
       current_user.use_ticket
     end
 
-    CourseMailer.sign_up(course).deliver_later
-    CourseMailer.reservation(course).deliver_later
+    CourseMailer.sign_up(@course).deliver_later
+    CourseMailer.reservation(@course).deliver_later
 
-    flash[:success] = "Signed up for a [#{course.language.name}] course with [#{course.teacher.user.username}] at [#{course.time_slot}]." # rubocop:disable Layout/LineLength
+    flash[:success] = "Signed up for a [#{@course.language.name}] course with [#{@course.teacher.user.username}] at [#{@course.time_slot}]." # rubocop:disable Layout/LineLength
     redirect_to courses_path
   end
 
   private
 
-  def find_course
-    Course.find(params[:id])
+  def set_course
+    @course = Course.find(params[:id])
+  end
+
+  def ensure_slot_allowed
+    teacher_profile = current_user.teacher_profile
+    return if teacher_profile.nil?
+
+    if teacher_profile.id == @course.teacher.id
+      flash[:info] = 'Unable to sign up for your own course.'
+      redirect_back fallback_location: root_path && return
+    end
+
+    teaching_slot = teacher_profile.courses.where(time_slot: @course.time_slot)
+    return if teaching_slot.empty?
+
+    flash[:info] = 'Unable to sign up : You already have a teaching slot registered at the same time.'
+    redirect_back fallback_location: root_path
   end
 end

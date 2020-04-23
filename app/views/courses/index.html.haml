@@ -8,27 +8,27 @@
   - if @years.empty?
     - if @year
       %span &#47;
-      = link_to courses_path(year: @year) do
+      = link_to courses_path(language: @lang_code, teacher: @teacher_name, year: @year) do
         = @year
       - if @months.empty?
         %span &#47;
-        = link_to courses_path(year: @year, month: @month) do
+        = link_to courses_path(language: @lang_code, teacher: @teacher_name, year: @year, month: @month) do
           = @month
         - if @days.empty?
           %span &#47;
-          = link_to courses_path(year: @year, month: @month) do
+          = link_to courses_path(language: @lang_code, teacher: @teacher_name, year: @year, month: @month) do
             = @day
         - else
           %br/
           Choose a day :
           - @days.each do |day|
-            = link_to courses_path(year: @year, month: @month, day: day) do
+            = link_to courses_path(language: @lang_code, teacher: @teacher_name, year: @year, month: @month, day: day) do
               = day
       - else
         %br/
         Choose a month :
         - @months.each do |month|
-          = link_to courses_path(year: @year, month: month) do
+          = link_to courses_path(language: @lang_code, teacher: @teacher_name, year: @year, month: month) do
             = month
     - else
       No course available.
@@ -66,7 +66,7 @@
     %br/
     Choose a year :
     - @years.each do |year|
-      = link_to courses_path(year: year) do
+      = link_to courses_path(language: @lang_code, teacher: @teacher_name, year: year) do
         = year
 
   %hr/
