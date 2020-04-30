@@ -10,7 +10,7 @@
     "bootstrap": "^4.4.1",
     "bootstrap-table": "^1.15.5",
     "cloudinary": "^1.18.1",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "popper.js": "^1.16.0",
     "tempusdominus-bootstrap-4": "^5.1.2",
     "turbolinks": "^5.2.0"
