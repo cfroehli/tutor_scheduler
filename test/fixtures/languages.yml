@@ -1,0 +1,11 @@
+lang_a:
+  code: la
+  name: 'Language A'
+
+lang_b:
+  code: lb
+  name: 'Language B'
+
+lang_c:
+  code: lc
+  name: 'Language C'

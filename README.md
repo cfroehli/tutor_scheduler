@@ -5,6 +5,8 @@ This is just a sandbox project used while learning ruby/rails. Do not trust this
 # TravisCI
 
 [![Build Status](https://travis-ci.com/cfroehli/tutor_scheduler.svg?branch=master)](https://travis-ci.com/cfroehli/tutor_scheduler)
+[![Maintainability](https://api.codeclimate.com/v1/badges/fb03e1f419e99246b69c/maintainability)](https://codeclimate.com/github/cfroehli/tutor_scheduler/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/fb03e1f419e99246b69c/test_coverage)](https://codeclimate.com/github/cfroehli/tutor_scheduler/test_coverage)
 
 # Coverage
 
@@ -54,26 +56,24 @@ This is just a sandbox project used while learning ruby/rails. Do not trust this
 
    * single container with vncserver
      ~~~bash
-       export USE_SELENIUM_CONTAINERS=Y
-       # edit application_system_test_case.rb => using: :chrome
-       # reduce test worker pool to 1 (or they'll fight for the only browser available)
+       export USE_SELENIUM_CONTAINERS=true
+       # edit spec/support/capybara.rb => using: :chrome instead of :headless_chrome
        docker-compose up -d selenium-chrome-standalone
        vncviewer {selenium-chrome-standalone ip} &
-       rails test:system
+       rails spec
      ~~~
 
    * or with a workers pool
      ~~~bash
-       export USE_SELENIUM_CONTAINERS=Y
-       # edit application_system_test_case.rb => driven_by using: :headless_chrome
+       export USE_SELENIUM_CONTAINERS=true
        docker-compose up -d selenium-hub
        docker-compose up -d --scale selenium-chrome=4 selenium-chrome
-       rails test:system
+       rails parallel:spec
      ~~~
 
    * or local chrome
      ~~~bash
        unset USE_SELENIUM_CONTAINERS
-       # edit application_system_test_case.rb => driven_by using: :headless_chrome or :chrome
-       rails test:system
+       # edit spec/support/capybara.rb => driven_by using: :headless_chrome or :chrome
+       rails spec
      ~~~

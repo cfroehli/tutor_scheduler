@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  teacher: one
+  language: la
+
+two:
+  teacher: one
+  language: lb
+
+three:
+  teacher: two
+  language: lb
+
+four:
+  teacher: two
+  language: lc

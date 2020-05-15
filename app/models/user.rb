@@ -22,7 +22,7 @@ class User < ApplicationRecord
     new_account_free_ticket.save
 
     # Default to 'user' role
-    add_role(:user) if roles.blank?
+    add_role(:user)
   end
 
   def login
