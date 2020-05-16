@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
-class TeachedLanguagePolicy < ApplicationPolicy
-  def activate?
+class AdminPolicy < Struct.new(:user, :admin)
+  def index?
     user.has_role? :admin
   end
 
-  def deactivate?
+  def impersonate?
     user.has_role? :admin
   end
+
 end

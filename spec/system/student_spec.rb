@@ -10,6 +10,14 @@ RSpec.describe 'Student usage:', type: :system, js: true do
 
   before { sign_in user }
 
+  it 'does not have access to admin section' do
+    visit root_path
+    expect(page).not_to have_text('Admin')
+    visit admin_index_path
+    expect(page).to have_text('You are not authorized to perform this action.')
+    expect(page).to have_current_path(root_path)
+  end
+
   context 'when no remaining ticket' do
     before { user.use_ticket while user.remaining_tickets > 0 }
 

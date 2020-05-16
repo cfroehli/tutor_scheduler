@@ -1,8 +1,12 @@
 # frozen_string_literal: true
 
 class AdminController < ApplicationController
+  def index
+    authorize :admin
+  end
+
   def impersonate
-    authorize User
+    authorize :admin
     user = User.find(params[:id])
     impersonate_user(user)
     redirect_to root_path
