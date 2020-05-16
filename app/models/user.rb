@@ -18,8 +18,7 @@ class User < ApplicationRecord
 
   after_create do
     # New user got free tickets to try our service
-    new_account_free_ticket = tickets.new(initial_count: 1, remaining: 1)
-    new_account_free_ticket.save
+    tickets.create(initial_count: 1, remaining: 1)
 
     # Default to 'user' role
     add_role(:user)
@@ -40,15 +39,16 @@ class User < ApplicationRecord
     end
   end
 
-  def use_ticket(ticket_count = 1)
-    ticket = tickets.valid.order('expiration ASC NULLS LAST').first
-    ticket.remaining -= ticket_count
-    ticket.save
+  def use_ticket
+    self.transaction do
+      ticket = tickets.valid.order('expiration ASC NULLS LAST').first
+      ticket.remaining -= 1
+      ticket.save
+    end
   end
 
   def add_tickets(ticket_count, expiration = nil)
-    new_tickets = tickets.new(initial_count: ticket_count, remaining: ticket_count, expiration: expiration)
-    new_tickets.save
+    tickets.create(initial_count: ticket_count, remaining: ticket_count, expiration: expiration)
   end
 
   def remaining_tickets
@@ -57,5 +57,11 @@ class User < ApplicationRecord
 
   def tickets_validity
     tickets.valid.group(:expiration).order(expiration: :desc).pluck(:expiration, 'SUM(remaining)')
+  end
+
+  def ensure_teacher_profile
+    return teacher_profile unless teacher_profile.nil?
+
+    teacher_profile.create(name: user.username, presentation: 'Present yourself here...')
   end
 end

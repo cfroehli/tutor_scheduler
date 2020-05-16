@@ -9,7 +9,7 @@ class Course < ApplicationRecord
 
   scope :with_teacher, ->(teacher) { where(teacher: teacher) }
   scope :with_student, ->(student) { where(student: student) }
-  scope :with_language, ->(language) { where(language: language).or(with_teacher(language.teachers)) }
+  scope :with_language, ->(language) { where(language: language).or(where(language: nil).with_teacher(language.teachers)) }
 
   scope :on_day, ->(year, month, day) { where('time_slot::date = ?', Date.new(year, month, day)) }
   scope :signed_up, -> { where.not(student: nil) }
@@ -43,5 +43,18 @@ class Course < ApplicationRecord
         .order(:day)
         .pluck(Arel.sql('extract(day from time_slot)::integer as day'))
     end
+  end
+
+  def sign_up(user, language_id)
+    transaction do
+      self.language = teacher.languages.find(language_id)
+      self.student = user
+      save
+      user.use_ticket
+    end
+    true
+  rescue ActiveRecord::Rollback => e
+    logger.error(e)
+    false
   end
 end

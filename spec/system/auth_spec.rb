@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Authentication flow :', type: :system, js: true do
+RSpec.describe 'Authentication flow:', type: :system, js: true do
   let(:user) { build(:user) }
 
   context 'when user is not logged' do

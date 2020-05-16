@@ -5,6 +5,7 @@ class CoursesController < ApplicationController
 
   before_action :set_course, only: %i[show edit update sign_up]
   before_action :ensure_slot_allowed, only: %i[sign_up]
+  before_action :ensure_has_tickets, only: %i[sign_up]
 
   def index
     @years   = []
@@ -87,18 +88,12 @@ class CoursesController < ApplicationController
   end
 
   def sign_up
-    Course.transaction do
-      @course.student = current_user
-      @course.language = Language.find(params[:language_id])
-      @course.save
-
-      current_user.use_ticket
+    if @course.sign_up(current_user, params[:language_id])
+      CourseMailer.sign_up(@course).deliver_later
+      CourseMailer.reservation(@course).deliver_later
+      flash[:success] = "Signed up for a [#{@course.language.name}] course with [#{@course.teacher.name}] at [#{@course.time_slot}]." # rubocop:disable Layout/LineLength
     end
 
-    CourseMailer.sign_up(@course).deliver_later
-    CourseMailer.reservation(@course).deliver_later
-
-    flash[:success] = "Signed up for a [#{@course.language.name}] course with [#{@course.teacher.user.username}] at [#{@course.time_slot}]." # rubocop:disable Layout/LineLength
     redirect_to courses_path
   end
 
@@ -114,13 +109,21 @@ class CoursesController < ApplicationController
 
     if teacher_profile.id == @course.teacher.id
       flash[:info] = 'Unable to sign up for your own course.'
-      redirect_back fallback_location: root_path && return
+      redirect_back fallback_location: root_path
+      return
     end
 
     teaching_slot = teacher_profile.courses.where(time_slot: @course.time_slot)
     return if teaching_slot.empty?
 
     flash[:info] = 'Unable to sign up : You already have a teaching slot registered at the same time.'
+    redirect_back fallback_location: root_path
+  end
+
+  def ensure_has_tickets
+    return if current_user.remaining_tickets > 0
+
+    flash[:danger] = 'You need a ticket to reserve a course.'
     redirect_back fallback_location: root_path
   end
 end

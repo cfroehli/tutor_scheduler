@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'User model :', type: :model do
+RSpec.describe 'User model:', type: :model do
   let(:user) { create(:user) }
 
   context 'when created' do
@@ -28,7 +28,7 @@ RSpec.describe 'User model :', type: :model do
     end
 
     it 'can use a ticket' do
-      expect { user.use_ticket(1) }.to change(user, :remaining_tickets).by(-1)
+      expect { user.use_ticket }.to change(user, :remaining_tickets).by(-1)
     end
 
     it 'uses ticket with closest expiration date in priority' do
@@ -36,7 +36,7 @@ RSpec.describe 'User model :', type: :model do
       user.add_tickets(1, expiration)
       user.add_tickets(1)
       expect(user.tickets_validity).to include([expiration.utc, 1])
-      expect { user.use_ticket(1) }.to change(user, :remaining_tickets).by(-1)
+      expect { user.use_ticket }.to change(user, :remaining_tickets).by(-1)
       expect(user.tickets_validity).not_to include([expiration.utc, 1])
     end
   end

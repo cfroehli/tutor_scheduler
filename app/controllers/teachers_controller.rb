@@ -36,11 +36,7 @@ class TeachersController < ApplicationController
     user_id = params[:user]
     language_id = params[:language]
     user = User.find(user_id)
-    if user.teacher_profile.nil?
-      user.teacher_profile = Teacher.new(user: user, name: user.username, presentation: 'Present yourself here...')
-      user.save
-    end
-    teacher = user.teacher_profile
+    teacher = user.ensure_teacher_profile
     language = Language.find(language_id)
     teached_language = TeachedLanguage.find_by(teacher: teacher, language: language)
     if teached_language.nil?
