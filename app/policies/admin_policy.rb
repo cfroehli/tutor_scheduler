@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AdminPolicy < Struct.new(:user, :admin)
+AdminPolicy = Struct.new(:user, :admin) do
   def index?
     user.has_role? :admin
   end
@@ -8,5 +8,4 @@ class AdminPolicy < Struct.new(:user, :admin)
   def impersonate?
     user.has_role? :admin
   end
-
 end

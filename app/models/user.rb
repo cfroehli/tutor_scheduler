@@ -62,6 +62,6 @@ class User < ApplicationRecord
   def ensure_teacher_profile
     return teacher_profile unless teacher_profile.nil?
 
-    teacher_profile.create(name: user.username, presentation: 'Present yourself here...')
+    self.create_teacher_profile(name: username, presentation: 'Present yourself here...')
   end
 end

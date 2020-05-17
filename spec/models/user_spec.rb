@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'User model:', type: :model do
+RSpec.describe User, type: :model do
   let(:user) { create(:user) }
 
   context 'when created' do
@@ -18,7 +18,7 @@ RSpec.describe 'User model:', type: :model do
   context 'when managing tickets' do
     it 'can add tickets without expiration date' do
       expect { user.add_tickets(1) }.to change(user, :remaining_tickets).by(1)
-      #expect(user.tickets.order(created_at: :desc).pluck(:expiration).first).to be_nil
+      expect(user.tickets.order(created_at: :desc).pluck(:expiration).first).to be_nil
     end
 
     it 'can add tickets with expiration date' do

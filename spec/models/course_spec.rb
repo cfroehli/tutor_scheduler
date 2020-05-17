@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Course model:', type: :model do
+RSpec.describe Course, type: :model do
   let(:user) { create(:user) }
   let(:english) { create(:language, :english) }
   let(:spanish) { create(:language, :spanish) }
@@ -47,23 +47,23 @@ RSpec.describe 'Course model:', type: :model do
       expect(available_courses).to match_array(teacher.courses)
 
       years = teacher.courses
-        .map { |c| c.time_slot.year }
-        .uniq.sort
+                     .map { |c| c.time_slot.year }
+                     .uniq.sort
       expect(available_courses.years).to eql(years)
 
       years.each do |year|
         months = teacher.courses
-          .where('extract(year from time_slot) = ?', year)
-          .map { |c| c.time_slot.month }
-          .uniq.sort
+                        .where('extract(year from time_slot) = ?', year)
+                        .map { |c| c.time_slot.month }
+                        .uniq.sort
         expect(available_courses.months(year)).to eql(months)
 
         months.each do |month|
           days = teacher.courses
-            .where('extract(year from time_slot) = ?', year)
-            .where('extract(month from time_slot) = ?', month)
-            .map { |c| c.time_slot.day }.
-            uniq.sort
+                        .where('extract(year from time_slot) = ?', year)
+                        .where('extract(month from time_slot) = ?', month)
+                        .map { |c| c.time_slot.day }
+                        .uniq.sort
           expect(available_courses.days(year, month)).to eql(days)
         end
       end

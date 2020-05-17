@@ -13,9 +13,8 @@ class CoursesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-   test 'should display course' do
-    get courses_url()
+  test 'should display course' do
+    get courses_url
     assert_response :success
   end
-
 end

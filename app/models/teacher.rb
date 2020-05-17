@@ -11,4 +11,15 @@ class Teacher < ApplicationRecord
   has_many :courses
 
   mount_uploader :image, ProfileImageUploader
+
+  def add_language(language_id)
+    language = Language.find(language_id)
+    teached_language = TeachedLanguage.find_by(teacher: self, language: language)
+    if teached_language.nil?
+      self.teached_languages.create(language: language)
+      { success: "Language #{language.name} added to teacher #{name}." }
+    else
+      { info: "Language #{language.name} already available for teacher #{name}." }
+    end
+  end
 end

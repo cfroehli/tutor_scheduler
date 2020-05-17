@@ -35,16 +35,10 @@ class TeachersController < ApplicationController
     authorize Teacher
     user_id = params[:user]
     language_id = params[:language]
+
     user = User.find(user_id)
     teacher = user.ensure_teacher_profile
-    language = Language.find(language_id)
-    teached_language = TeachedLanguage.find_by(teacher: teacher, language: language)
-    if teached_language.nil?
-      teached_language = TeachedLanguage.new(teacher: teacher, language: language)
-      flash[:success] = "Language #{language.name} added to teacher #{teacher.name}." if teached_language.save
-    else
-      flash[:info] = "Language #{teached_language.language.name} already available for teacher #{teached_language.teacher.name}." # rubocop:disable Layout/LineLength
-    end
+    flash.merge!(teacher.add_language(language_id))
     redirect_back fallback_location: root_path
   end
 

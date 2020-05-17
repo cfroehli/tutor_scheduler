@@ -91,7 +91,7 @@ class CoursesController < ApplicationController
     if @course.sign_up(current_user, params[:language_id])
       CourseMailer.sign_up(@course).deliver_later
       CourseMailer.reservation(@course).deliver_later
-      flash[:success] = "Signed up for a [#{@course.language.name}] course with [#{@course.teacher.name}] at [#{@course.time_slot}]." # rubocop:disable Layout/LineLength
+      flash[:success] = "Signed up for a [#{@course.language.name}] course with [#{@course.teacher.name}] at [#{@course.time_slot}]."
     end
 
     redirect_to courses_path
@@ -121,7 +121,7 @@ class CoursesController < ApplicationController
   end
 
   def ensure_has_tickets
-    return if current_user.remaining_tickets > 0
+    return if current_user.remaining_tickets.positive?
 
     flash[:danger] = 'You need a ticket to reserve a course.'
     redirect_back fallback_location: root_path

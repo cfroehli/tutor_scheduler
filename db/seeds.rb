@@ -161,7 +161,7 @@ languages = [
   %w[sr Serbian],
   %w[ss Swati],
   %w[su Sundanese],
-  ['sw', 'Swahili '],
+  %w[sw Swahili],
   %w[sv Swedish],
   %w[ty Tahitian],
   %w[ta Tamil],
@@ -191,7 +191,7 @@ languages = [
   %w[yo Yoruba],
   %w[za Zhuang],
   %w[zh Chinese],
-  %w[zu Zulu]
+  %w[zu Zulu],
 ]
 
 languages.each do |code, name|

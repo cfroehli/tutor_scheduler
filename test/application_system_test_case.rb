@@ -13,7 +13,7 @@ if ENV['USE_SELENIUM_CONTAINERS']
               screen_size: [1024, 800],
               options: {
                 url: 'http://selenium-server:4444/wd/hub',
-                desired_capabilities: capabilities
+                desired_capabilities: capabilities,
               }
 
     def setup

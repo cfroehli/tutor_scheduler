@@ -2,7 +2,9 @@
 
 class AddStripePlanIdToUsers < ActiveRecord::Migration[6.0]
   def change
-    add_column :users, :stripe_plan_id, :string
-    add_column :users, :stripe_subscription_id, :string
+    change_table :users, bulk: true do |t|
+      t.string :stripe_plan_id
+      t.string :stripe_subscription_id
+    end
   end
 end
