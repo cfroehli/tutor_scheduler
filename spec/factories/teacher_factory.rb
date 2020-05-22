@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :teacher do
     user
-    sequence(:name) { |n| "user#{n}" }
+    sequence(:name) { |n| "teacher#{n}" }
 
     factory :teacher_with_courses do
       transient do

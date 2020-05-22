@@ -46,6 +46,8 @@ class Course < ApplicationRecord
   end
 
   def sign_up(user, language_id)
+    return false if self.student.present?
+
     transaction do
       self.language = teacher.languages.find(language_id)
       self.student = user
@@ -53,7 +55,7 @@ class Course < ApplicationRecord
       user.use_ticket
     end
     true
-  rescue ActiveRecord::Rollback => e
+  rescue ActiveRecord::RecordNotFound => e
     logger.error(e)
     false
   end

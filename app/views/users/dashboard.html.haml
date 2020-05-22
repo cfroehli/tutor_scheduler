@@ -6,7 +6,7 @@
     .card-text
       - remaining_tickets = current_user.remaining_tickets
       - if remaining_tickets == 0
-        No ticket available : 
+        No ticket available :
         = link_to new_ticket_path do
           Buy a few tickets here.
       - else
@@ -16,16 +16,16 @@
           - if expiration.nil?
             %li= "#{remaining} tickets without any date limit"
           - else
-            %li= "#{remaining} tickets to use before #{expiration}"                   
+            %li= "#{remaining} tickets to use before #{expiration}"
 
     - unless current_user.teacher_profile.nil?
-      %hr/    
+      %hr/
       .card-text
-        .h4 Planned tutoring 
+        .h4 Planned tutoring
         - current_user.teacher_profile.courses.planned.each do | c |
           .row
             .col-sm-3
-              At #{c.time_slot} 
+              At #{c.time_slot}
             .col-sm-3
               Teaching #{c.language.name} to #{c.student.username}
               = link_to c.zoom_url do
@@ -35,14 +35,14 @@
                 No content available yet.
               - else
                 #{c.content}
-        
-    %hr/      
+
+    %hr/
     .card-text
-      .h4 Planned learning 
+      .h4 Planned learning
       - current_user.courses.planned.each do | c |
         .row
           .col-sm-3
-            At #{c.time_slot} 
+            At #{c.time_slot}
           .col-sm-3
             Learning #{c.language.name} with #{c.teacher.user.username}
             = link_to c.zoom_url do
@@ -51,13 +51,13 @@
             - if c.content.blank?
               No content available yet
             - else
-              #{c.content}      
+              #{c.content}
 
     %hr/
     .card-text
       .h4 Past courses
       - current_user.courses.past.each do | c |
-        .row 
+        .row
           .col-sm-3
             At #{c.time_slot}
           .col-sm-3

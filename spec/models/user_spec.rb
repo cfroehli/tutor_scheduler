@@ -22,9 +22,9 @@ RSpec.describe User, type: :model do
     end
 
     it 'can add tickets with expiration date' do
-      expiration = (DateTime.now + 1.day).change(usec: 0)
+      expiration = (DateTime.current + 1.day).change(usec: 0)
       expect { user.add_tickets(1, expiration) }.to change(user, :remaining_tickets).by(1)
-      expect(user.tickets_validity).to include([expiration.utc, 1])
+      expect(user.tickets_validity).to include([expiration, 1])
     end
 
     it 'can use a ticket' do
@@ -32,12 +32,12 @@ RSpec.describe User, type: :model do
     end
 
     it 'uses ticket with closest expiration date in priority' do
-      expiration = (DateTime.now + 1.hour).change(usec: 0)
+      expiration = (DateTime.current + 1.hour).change(usec: 0)
       user.add_tickets(1, expiration)
       user.add_tickets(1)
-      expect(user.tickets_validity).to include([expiration.utc, 1])
+      expect(user.tickets_validity).to include([expiration, 1])
       expect { user.use_ticket }.to change(user, :remaining_tickets).by(-1)
-      expect(user.tickets_validity).not_to include([expiration.utc, 1])
+      expect(user.tickets_validity).not_to include([expiration, 1])
     end
   end
 end

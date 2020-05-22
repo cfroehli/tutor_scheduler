@@ -2,7 +2,7 @@
 
 %h3.text-center Administration
 
-.card
+#impersonation.card
   .card-header User impersonation
   .card-body
     - User.order(:id).each do |user|
@@ -13,7 +13,7 @@
 
 %br/
 
-.card
+#teacher-register.card
   .card-header Register user as a teacher
   .card-body
     .card-text
@@ -30,7 +30,7 @@
 %br/
 
 - active_lang, inactive_lang = TeachedLanguage.status
-.card
+#active-languages.card
   .card-header Active languages
   .card-body
     .card-text
@@ -51,7 +51,7 @@
 
 %br/
 
-.card
+#inactive-languages.card
   .card-header Inactive languages
   .card-body
     .card-text

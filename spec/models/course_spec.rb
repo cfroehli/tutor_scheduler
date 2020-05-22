@@ -12,19 +12,19 @@ RSpec.describe Course, type: :model do
 
   context 'when a course is added' do
     it 'is not in the past' do
-      expect(Course.past).to be_empty
+      expect(Course.past).not_to include(course)
     end
 
     it 'is not signed up' do
-      expect(Course.signed_up).to be_empty
+      expect(Course.signed_up).not_to include(course)
     end
 
     it 'is not planned' do
-      expect(Course.planned).to be_empty
+      expect(Course.planned).not_to include(course)
     end
 
     it 'is not done' do
-      expect(Course.planned).to be_empty
+      expect(Course.done).not_to include(course)
     end
 
     it 'is in the future' do
@@ -74,7 +74,7 @@ RSpec.describe Course, type: :model do
     end
 
     it 'has no student' do
-      expect(Course.with_student(user)).to be_empty
+      expect(Course.with_student(user)).not_to include(course)
     end
 
     it 'match the teacher languages' do
@@ -84,16 +84,16 @@ RSpec.describe Course, type: :model do
     end
 
     it 'does match other languages' do
-      expect(Course.with_language(french)).to be_empty
+      expect(Course.with_language(french)).not_to include(course)
     end
 
     it 'does not require feedback or content' do
-      expect(Course.action_required).to be_empty
+      expect(Course.action_required).not_to include(course)
     end
   end
 
   def move_course_to_past
-    course.time_slot = DateTime.now - 1.week
+    course.time_slot = DateTime.current - 1.week
     course.save
   end
 
@@ -121,12 +121,26 @@ RSpec.describe Course, type: :model do
     end
 
     it 'does not require feedback or content' do
-      expect(Course.action_required).to be_empty
+      expect(Course.action_required).not_to include(course)
     end
+  end
+
+  it 'reject reservation on unavailable languages' do
+    result = nil
+    expect { result = course.sign_up(user, french.id) }.to change(user, :remaining_tickets).by(0)
+    expect(result).to be false
+    expect(course.language).to be_nil
+    expect(course.student).to be_nil
   end
 
   context 'when a course is reserved' do
     before { course.sign_up(user, english.id) }
+
+    it 'reject a double reservation' do
+      result = nil
+      expect { result = course.sign_up(user, english.id) }.to change(user, :remaining_tickets).by(0)
+      expect(result).to be false
+    end
 
     it 'is not available' do
       expect(Course.available).not_to include(course)

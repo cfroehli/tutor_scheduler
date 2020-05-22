@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Student usage:', type: :system, js: true do
+RSpec.describe 'Student', type: :system, js: true do
   let(:user) { create(:user) }
   let(:english) { create(:language, :english) }
   let(:spanish) { create(:language, :spanish) }
@@ -18,6 +18,17 @@ RSpec.describe 'Student usage:', type: :system, js: true do
     expect(page).to have_current_path(root_path)
   end
 
+  it 'can only see the teacher profile' do
+    visit root_path
+    expect(page).not_to have_text('Teaching')
+
+    visit teacher_path(teacher.id)
+    expect(page).to have_text('Teacher profile')
+    expect(page).not_to have_text('Registering new courses slots')
+    expect(page).not_to have_text('Action required')
+    expect(page).not_to have_text('Current slots')
+  end
+
   context 'when no remaining ticket' do
     before { user.use_ticket while user.remaining_tickets > 0 }
 
@@ -27,40 +38,49 @@ RSpec.describe 'Student usage:', type: :system, js: true do
     end
   end
 
+  # TODO: regroup & move out
+  def open_course_reservation_page
+    visit courses_path
+    click_on course.time_slot.year.to_s
+    expect(page).to have_text('Choose a month')
+    click_on course.time_slot.month.to_s
+    expect(page).to have_text('Choose a day')
+    click_on course.time_slot.day.to_s
+  end
+
   context 'when a ticket is available' do
+    let(:course) { teacher.courses.order(time_slot: :asc).first }
+
     before do
       user.add_tickets(1)
-      teacher.user.add_tickets(1)
-    end
-
-    let(:course) { teacher.courses.first }
-
-    def open_course_reservation_page
-      visit courses_path
-      click_on course.time_slot.year.to_s
-      expect(page).to have_text('Choose a month')
-      click_on course.time_slot.month.to_s
-      expect(page).to have_text('Choose a day')
-      click_on course.time_slot.day.to_s
+      open_course_reservation_page
     end
 
     it 'can reserve a course' do
-      open_course_reservation_page
-      expect { click_on '[Spanish]', match: :first }.to change(user, :remaining_tickets).by(-1)
-      expect(page).to have_text("Signed up for a [Spanish] course with [#{teacher.name}] at [#{course.time_slot}].")
+      expect { click_on "[#{spanish.name}]", match: :first }.to change(user, :remaining_tickets).by(-1)
+      expect(page).to have_text("Signed up for a [#{spanish.name}] course with [#{teacher.name}] at [#{course.time_slot.in_time_zone}].")
       course.reload
       expect(course.student).to eql(user)
       expect(course.language).to eql(spanish)
     end
+  end
 
-    it 'cant reserve his own course' do
-      sign_in teacher.user
-      open_course_reservation_page
-      expect { click_on '[Spanish]', match: :first }.to change(teacher.user, :remaining_tickets).by(0)
-      expect(page).to have_text('Unable to sign up for your own course.')
-      course.reload
-      expect(course.student).to be_nil
-      expect(course.language).to be_nil
+  context 'when displaying the dashboard' do
+    before { visit root_path }
+
+    it 'shows the remaining tickets' do
+      expect(page).to have_text("Remaining tickets: #{user.remaining_tickets}")
+    end
+
+    it 'shows the tickets validity details' do
+      user.tickets_validity.each do |expiration, remaining|
+        expected_text = if expiration.nil?
+                          "#{remaining} tickets without any date limit"
+                        else
+                          "#{remaining} tickets to use before #{expiration}"
+                        end
+        expect(page).to have_text(expected_text)
+      end
     end
   end
 end

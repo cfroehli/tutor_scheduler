@@ -91,7 +91,7 @@ class CoursesController < ApplicationController
     if @course.sign_up(current_user, params[:language_id])
       CourseMailer.sign_up(@course).deliver_later
       CourseMailer.reservation(@course).deliver_later
-      flash[:success] = "Signed up for a [#{@course.language.name}] course with [#{@course.teacher.name}] at [#{@course.time_slot}]."
+      flash[:success] = "Signed up for a [#{@course.language.name}] course with [#{@course.teacher.name}] at [#{@course.time_slot.in_time_zone}]."
     end
 
     redirect_to courses_path
