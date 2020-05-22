@@ -82,7 +82,7 @@ class CoursesController < ApplicationController
     post_params = params.require(:course).permit(:zoom_url, :content, :feedback)
     if @course.update(post_params)
       flash[:success] = 'Course was successfully updated.'
-      CourseMailer.notify_feedback_update(@course).deliver_later if course.feedback_changed?
+      CourseMailer.notify_feedback_update(@course).deliver_later if @course.feedback_changed?
     end
     redirect_back fallback_location: root_path
   end
