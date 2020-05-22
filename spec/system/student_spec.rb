@@ -57,7 +57,9 @@ RSpec.describe 'Student', type: :system, js: true do
     end
 
     it 'can reserve a course' do
-      expect { click_on "[#{spanish.name}]", match: :first }.to change(user, :remaining_tickets).by(-1)
+      expect { click_on "[#{spanish.name}]", match: :first }
+        .to change(user, :remaining_tickets).by(-1)
+        .and change(ActionMailer::Base.deliveries, :count).by(2)
       expect(page).to have_text("Signed up for a [#{spanish.name}] course with [#{teacher.name}] at [#{course.time_slot.in_time_zone}].")
       course.reload
       expect(course.student).to eql(user)

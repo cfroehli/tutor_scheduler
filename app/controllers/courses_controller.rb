@@ -82,15 +82,12 @@ class CoursesController < ApplicationController
     post_params = params.require(:course).permit(:zoom_url, :content, :feedback)
     if @course.update(post_params)
       flash[:success] = 'Course was successfully updated.'
-      CourseMailer.notify_feedback_update(@course).deliver_later if @course.feedback_changed?
     end
     redirect_back fallback_location: root_path
   end
 
   def sign_up
     if @course.sign_up(current_user, params[:language_id])
-      CourseMailer.sign_up(@course).deliver_later
-      CourseMailer.reservation(@course).deliver_later
       flash[:success] = "Signed up for a [#{@course.language.name}] course with [#{@course.teacher.name}] at [#{@course.time_slot.in_time_zone}]."
     end
 

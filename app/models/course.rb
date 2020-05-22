@@ -3,6 +3,9 @@
 class Course < ApplicationRecord
   class << self; undef :open; end
 
+  after_update :send_feedback_notifications, if: -> { saved_change_to_feedback? }
+  after_update :send_sign_up_notifications, if: -> { saved_change_to_student_id? || saved_change_to_language_id? }
+
   belongs_to :teacher
   belongs_to :language, optional: true, default: nil
   belongs_to :student, class_name: 'User', optional: true, default: nil
@@ -46,17 +49,26 @@ class Course < ApplicationRecord
   end
 
   def sign_up(user, language_id)
-    return false if self.student.present?
+    return false if student.present?
 
     transaction do
-      self.language = teacher.languages.find(language_id)
-      self.student = user
-      save
+      update(language: teacher.languages.find(language_id), student: user)
       user.use_ticket
     end
     true
   rescue ActiveRecord::RecordNotFound => e
     logger.error(e)
     false
+  end
+
+  private
+
+  def send_feedback_notifications
+    CourseMailer.notify_feedback_update(self).deliver_later
+  end
+
+  def send_sign_up_notifications
+    CourseMailer.sign_up(self).deliver_later
+    CourseMailer.reservation(self).deliver_later
   end
 end

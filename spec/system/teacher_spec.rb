@@ -79,4 +79,59 @@ RSpec.describe 'Teacher', type: :system, js: true do
       expect(page).to have_text('Courses were successfully created.')
     end
   end
+
+  context 'when a course is signed up' do
+    let(:student) { create(:user) }
+    let(:course) { teacher.courses.order(time_slot: :asc).first }
+
+    before { course.sign_up(student, english.id) }
+
+    it 'can access the student history' do
+      visit teacher_path(teacher.id)
+      within('#current_slots') { click_on student.username }
+      expect(page).to have_current_path(courses_history_user_path(student.id))
+    end
+
+    context 'and is past' do
+      before do
+        course.update(time_slot: course.time_slot - 5.days)
+        visit teacher_path(teacher.id)
+      end
+
+      it 'is displayed in the action required list' do
+        within('#past_slots') do
+          expect(page).to have_text(course.student.username)
+          expect(page).to have_text(course.language.name)
+        end
+      end
+
+      it 'feedback/content can be added' do
+        within('#past_slots') do
+          row = find('td', text: course.student.username).ancestor('tr')
+          row.all('td').last.find('a', text: 'Content').click
+        end
+        expect(page).to have_current_path(edit_course_path(course.id))
+        fill_in 'content-area', with: "#{course.id} content"
+        click_on 'Submit'
+        expect(page).to have_text('Course was successfully updated.')
+
+        visit teacher_path(teacher.id)
+        within('#past_slots') do
+          row = find('td', text: course.student.username).ancestor('tr')
+          row.all('td').last.find('a', text: 'Feedback').click
+        end
+        expect(page).to have_current_path(edit_course_path(course.id))
+        fill_in 'feedback-area', with: "#{course.id} feedback"
+        expect do
+          click_on 'Submit'
+          expect(page).to have_text('Course was successfully updated.')
+        end.to change(ActionMailer::Base.deliveries, :count).by(1)
+        expect(page).to have_current_path(edit_course_path(course.id))
+
+        sign_in course.student
+        visit root_path
+        expect(page).to have_text("#{course.id} feedback")
+      end
+    end
+  end
 end

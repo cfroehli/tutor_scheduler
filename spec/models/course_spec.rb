@@ -93,8 +93,7 @@ RSpec.describe Course, type: :model do
   end
 
   def move_course_to_past
-    course.time_slot = DateTime.current - 1.week
-    course.save
+    course.update(time_slot: DateTime.current - 1.week)
   end
 
   context 'when a course expired' do
