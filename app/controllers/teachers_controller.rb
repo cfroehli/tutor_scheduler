@@ -9,18 +9,6 @@ class TeachersController < ApplicationController
     @course = Course.new
   end
 
-  def new
-    @teacher = Teacher.new
-    authorize @teacher
-  end
-
-  def create
-    @teacher = current_user.new(post_params)
-    authorize @teacher
-    flash[:success] = 'Teacher profile was successfully created.' if @teacher.save
-    respond_with @teacher
-  end
-
   def edit
     authorize @teacher
   end

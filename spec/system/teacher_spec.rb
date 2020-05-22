@@ -79,6 +79,4 @@ RSpec.describe 'Teacher', type: :system, js: true do
       expect(page).to have_text('Courses were successfully created.')
     end
   end
-
-
 end

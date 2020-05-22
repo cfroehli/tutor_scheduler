@@ -17,6 +17,6 @@ class TeachedLanguagesController < ApplicationController
 
   def change_active_state(new_active_state)
     teached_language = TeachedLanguage.find(params[:id])
-    teached_language.update(:active, new_active_state)
+    teached_language.update(active: new_active_state)
   end
 end

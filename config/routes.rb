@@ -45,7 +45,7 @@ Rails.application.routes.draw do
       get 'deactivate'
     end
   end
-  resources :teachers, except: [:destroy] do
+  resources :teachers, except: %i[new create destroy] do
     collection do
       post 'add_language'
       get 'action_required_courses'

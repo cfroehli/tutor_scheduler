@@ -1,3 +1,30 @@
+- content_for :packs, 'cloudinary-upload'
+- content_for :no_css_packs, 'cloudinary-upload'
+
 %h3.text-center Update teaching profile
 
-= render 'form'
+= form_with model: @teacher do |f|
+  - if @teacher.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@teacher.errors.count, "error")} prohibited this profile from being saved:"
+      %ul
+        - @teacher.errors.full_messages.each do |message|
+          %li= message
+
+  .form-group.row
+    = f.label :name, class: 'col-form-label col-sm-2'
+    = f.text_field :name, class: 'form-control col-sm-10'
+
+  .form-group.row
+    = f.hidden_field :image_cache
+    .custom-file
+      = f.label :image, class: 'custom-file-label'
+      = f.file_field :image, class: 'custom-file-input cloudinary-fileupload'
+
+  .form-group.row
+    = f.label :presentation, class: 'col-form-label col-sm-2'
+    = f.text_area :presentation, rows: 15, id: 'teacher-presentation-area', class: 'form-control col-sm-10'
+
+  %br/
+  .text-center
+    = f.button 'Submit', class: 'btn btn-primary'

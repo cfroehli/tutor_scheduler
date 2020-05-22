@@ -14,5 +14,10 @@ FactoryBot.define do
       code { 'fr' }
       name { 'French' }
     end
+
+    trait :italian do
+      code { 'it' }
+      name { 'Italian' }
+    end
   end
 end

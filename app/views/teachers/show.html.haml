@@ -1,70 +1,63 @@
 %h3.text-center Teacher profile
 
-- if @teacher
-  - content_for :packs, 'bootstrap-table,bootstrap-tempusdominus,bootstrap-multiselect,tutor-scheduler-teachers'
-  - content_for :no_css_packs, 'tutor-scheduler-teachers'
+- content_for :packs, 'bootstrap-table,bootstrap-tempusdominus,bootstrap-multiselect,tutor-scheduler-teachers'
+- content_for :no_css_packs, 'tutor-scheduler-teachers'
 
-  = render 'teacher', {teacher: @teacher}
+= render 'teacher', {teacher: @teacher}
 
-  - if current_user.id == @teacher.user.id
-    %br/
+- if current_user.id == @teacher.user.id
+  %br/
 
-    %h3.text-center Registering new courses slots
+  %h3.text-center Registering new courses slots
 
-    = form_with url: courses_path  do |f|
-      - if @course.errors.any?
-        #error_explanation
-          %h2= "#{pluralize(@course.errors.count, "error")} prohibited this course from being saved:"
-          %ul
-            - @course.errors.full_messages.each do |message|
-              %li= message
+  = form_with url: courses_path  do |f|
+    - if @course.errors.any?
+      #error_explanation
+        %h2= "#{pluralize(@course.errors.count, "error")} prohibited this course from being saved:"
+        %ul
+          - @course.errors.full_messages.each do |message|
+            %li= message
 
-      .form-group
-        .input-group.date#day_picker{data: {'target-input':"nearest", 'date-format': "YYYY-MM-DD", 'date-allow-multidate': "true", 'date-min-date': "#{Date.today.strftime('%Y-%m-%d')}"}}
-          = f.label :days, class: 'form-control col-sm-2'
-          = f.text_field :days, class: 'form-control datetimepicker-input', 'data-target': "#day_picker"
-          .input-group-append{data: {target: "#day_picker", toggle: "datetimepicker"}}
-            .input-group-text
-              %i.fas.fa-calendar
+    .form-group
+      .input-group.date#day_picker{data: {'target-input':"nearest", 'date-format': "YYYY-MM-DD", 'date-allow-multidate': "true", 'date-min-date': "#{Date.today.strftime('%Y-%m-%d')}"}}
+        = f.label :days, class: 'form-control col-sm-2'
+        = f.text_field :days, class: 'form-control datetimepicker-input', 'data-target': "#day_picker"
+        .input-group-append{data: {target: "#day_picker", toggle: "datetimepicker"}}
+          .input-group-text
+            %i.fas.fa-calendar
 
-        .input-group
-          = f.label :hours, class: 'form-control col-sm-2'
-          - hours = [['Early birds', [7, 8]], ['Morning', [9, 10, 11]], ['Noon', [12, 13]], ['Afternoon', [14, 15, 16, 17]], ['Evening', [18, 19, 20]], ['Nigth Owl', [21, 22]]]
-          = f.select :hours, grouped_options_for_select(hours), {}, {class: 'form-control col-sm-10', multiple: 'multiple'}
+      .input-group
+        = f.label :hours, class: 'form-control col-sm-2'
+        - hours = [['Early birds', [7, 8]], ['Morning', [9, 10, 11]], ['Noon', [12, 13]], ['Afternoon', [14, 15, 16, 17]], ['Evening', [18, 19, 20]], ['Nigth Owl', [21, 22]]]
+        = f.select :hours, grouped_options_for_select(hours), {}, {class: 'form-control col-sm-10', multiple: 'multiple'}
 
-        .input-group
-          = f.label :zoom_url, class: 'form-control col-sm-2'
-          = f.text_field :zoom_url, class: 'form-control'
-
-      %br/
-
-      .text-center
-        = f.button 'Add', class: 'btn btn-primary', data: { disable_with: "Registering course..." }
+      .input-group
+        = f.label :zoom_url, class: 'form-control col-sm-2'
+        = f.text_field :zoom_url, class: 'form-control'
 
     %br/
 
-    .h3.text-center Action required
-    %table#past_slots{'data-url': "#{action_required_courses_teachers_path}", 'data-toggle': 'table'}
-      %thead
-        %tr
-          %th{'data-field':"time_slot"} Date
-          %th{'data-field':"language"} Language
-          %th{'data-field':"student"} Student
-          %th{'data-field':"actions", 'data-formatter': 'action_formatter'} Missing
+    .text-center
+      = f.button 'Add', class: 'btn btn-primary', data: { disable_with: "Registering course..." }
 
-    %br/
+  %br/
 
-    .h3.text-center Current slots
-    %table#current_slots{'data-url': "#{future_courses_teachers_path}", 'data-toggle': 'table'}
-      %thead
-        %tr
-          %th{'data-field':"time_slot"} Date
-          %th{'data-field':"language"} Language
-          %th{'data-field':"student", 'data-formatter':'student_history_formatter'} Student
-          %th{'data-field':"zoom_url"} Zoom
+  %h3.text-center Action required
+  %table#past_slots{'data-url': "#{action_required_courses_teachers_path}", 'data-toggle': 'table'}
+    %thead
+      %tr
+        %th{'data-field':"time_slot"} Date
+        %th{'data-field':"language"} Language
+        %th{'data-field':"student"} Student
+        %th{'data-field':"actions", 'data-formatter': 'action_formatter'} Missing
 
-- else
+  %br/
 
-  Create a
-  = link_to new_teacher_path do
-    teaching profile
+  %h3.text-center Current slots
+  %table#current_slots{'data-url': "#{future_courses_teachers_path}", 'data-toggle': 'table'}
+    %thead
+      %tr
+        %th{'data-field':"time_slot"} Date
+        %th{'data-field':"language"} Language
+        %th{'data-field':"student", 'data-formatter':'student_history_formatter'} Student
+        %th{'data-field':"zoom_url"} Zoom
