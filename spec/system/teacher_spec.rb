@@ -25,28 +25,19 @@ RSpec.describe 'Teacher', type: :system, js: true do
     end
   end
 
-  # TODO: regroup & move out
-  def open_course_reservation_page
-    visit courses_path
-    click_on course.time_slot.year.to_s
-    expect(page).to have_text('Choose a month')
-    click_on course.time_slot.month.to_s
-    expect(page).to have_text('Choose a day')
-    click_on course.time_slot.day.to_s
-  end
-
   context 'when displaying the course reservation page' do
     let(:course) { teacher.courses.order(time_slot: :asc).first }
 
     before do
       teacher.user.add_tickets(1)
-      open_course_reservation_page
+      open_course_reservation_page(course)
     end
 
     it 'cant reserve his own course' do
       # TODO: hide own course from reservation page and ensure in
       # this test we cant reserve by forging a POST request
-      expect { click_on "[#{spanish.name}]", match: :first }.to change(teacher.user, :remaining_tickets).by(0)
+      expect { click_on "[#{spanish.name}]", match: :first }
+        .to change(teacher.user, :remaining_tickets).by(0)
       expect(page).to have_text('Unable to sign up for your own course.')
       course.reload
       expect(course.student).to be_nil

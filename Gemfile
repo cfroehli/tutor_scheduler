@@ -54,7 +54,7 @@ gem 'cloudinary', '~> 1.13'
 gem 'roadie', '~> 4.0'
 
 gem 'httparty', '~> 0.18.0'
-gem 'stripe', '~> 5.17.0'
+gem 'stripe', '~> 5.22.0'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
@@ -62,6 +62,10 @@ group :development, :test do
   gem 'factory_bot_rails', '~> 5.2.0'
   gem 'parallel_tests', '~> 2.32.0'
   gem 'rspec-rails', '~> 4.0.0'
+
+  # stripe-mock
+  gem 'puffing-billy', '~> 2.3.0'
+  gem 'stripe-ruby-mock', github: 'cfroehli/stripe-ruby-mock', :require => 'stripe_mock'
 end
 
 group :development do

@@ -38,22 +38,12 @@ RSpec.describe 'Student', type: :system, js: true do
     end
   end
 
-  # TODO: regroup & move out
-  def open_course_reservation_page
-    visit courses_path
-    click_on course.time_slot.year.to_s
-    expect(page).to have_text('Choose a month')
-    click_on course.time_slot.month.to_s
-    expect(page).to have_text('Choose a day')
-    click_on course.time_slot.day.to_s
-  end
-
   context 'when a ticket is available' do
     let(:course) { teacher.courses.order(time_slot: :asc).first }
 
     before do
       user.add_tickets(1)
-      open_course_reservation_page
+      open_course_reservation_page(course)
     end
 
     it 'can reserve a course' do

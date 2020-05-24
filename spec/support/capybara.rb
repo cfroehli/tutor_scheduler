@@ -1,4 +1,4 @@
-Capybara.default_max_wait_time = 15 if ENV['TRAVIS']
+Capybara.default_max_wait_time = ENV['TRAVIS'] ? 15 : 5
 
 RSpec.configure do |config|
   config.before(:each, type: :system) do

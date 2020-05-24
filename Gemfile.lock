@@ -11,6 +11,15 @@ GIT
       rubocop-rails (~> 2.5.2)
       rubocop-rspec (~> 1.39.0)
 
+GIT
+  remote: https://github.com/cfroehli/stripe-ruby-mock.git
+  revision: 975684094274d6fadf531561f49b62f01ec223d4
+  specs:
+    stripe-ruby-mock (3.0.1)
+      dante (>= 0.2.0)
+      multi_json (~> 1.0)
+      stripe (> 5, < 6)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -106,9 +115,11 @@ GEM
       rest-client
     coderay (1.1.2)
     concurrent-ruby (1.1.6)
+    cookiejar (0.3.3)
     crass (1.0.6)
     css_parser (1.7.1)
       addressable
+    dante (0.2.0)
     devise (4.7.1)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
@@ -119,8 +130,21 @@ GEM
     docile (1.3.2)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
+    em-http-request (1.1.5)
+      addressable (>= 2.3.4)
+      cookiejar (!= 0.3.1)
+      em-socksify (>= 0.3)
+      eventmachine (>= 1.0.3)
+      http_parser.rb (>= 0.6.0)
+    em-socksify (0.3.2)
+      eventmachine (>= 1.0.0.beta.4)
+    em-synchrony (1.0.6)
+      eventmachine (>= 1.0.0.beta.1)
     erubi (1.9.0)
     erubis (2.7.0)
+    eventmachine (1.2.7)
+    eventmachine (1.2.7-java)
+    eventmachine_httpserver (0.2.1)
     factory_bot (5.2.0)
       activesupport (>= 4.2.0)
     factory_bot_rails (5.2.0)
@@ -152,6 +176,8 @@ GEM
     http-accept (1.7.0)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
+    http_parser.rb (0.6.0)
+    http_parser.rb (0.6.0-java)
     httparty (0.18.0)
       mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
@@ -188,6 +214,7 @@ GEM
     minitest (5.14.1)
     msgpack (1.3.3)
     msgpack (1.3.3-java)
+    multi_json (1.14.1)
     multi_xml (0.6.0)
     netrc (0.11.0)
     nio4r (2.5.2)
@@ -215,6 +242,14 @@ GEM
       pry (~> 0.11)
       yard (~> 0.9.11)
     public_suffix (4.0.5)
+    puffing-billy (2.3.1)
+      addressable (~> 2.5)
+      em-http-request (~> 1.1, >= 1.1.0)
+      em-synchrony
+      eventmachine (~> 1.2)
+      eventmachine_httpserver
+      http_parser.rb (~> 0.6.0)
+      multi_json
     puma (4.3.5)
       nio4r (~> 2.0)
     puma (4.3.5-java)
@@ -344,7 +379,7 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
-    stripe (5.17.0)
+    stripe (5.22.0)
     sysexits (1.2.0)
     temple (0.8.2)
     thor (1.0.1)
@@ -412,6 +447,7 @@ DEPENDENCIES
   pretender (~> 0.3.4)
   pry
   pry-doc
+  puffing-billy (~> 2.3.0)
   puma (~> 4.1)
   pundit (~> 2.1.0)
   rails (~> 6.0.2, >= 6.0.2.1)
@@ -425,7 +461,8 @@ DEPENDENCIES
   simplecov (~> 0.10, < 0.18)
   spring
   spring-watcher-listen (~> 2.0.0)
-  stripe (~> 5.17.0)
+  stripe (~> 5.22.0)
+  stripe-ruby-mock!
   turbolinks (~> 5)
   tzinfo-data
   web-console (>= 3.3.0)

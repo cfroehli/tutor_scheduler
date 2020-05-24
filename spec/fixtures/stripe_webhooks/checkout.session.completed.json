@@ -1,0 +1,53 @@
+{
+  "id": "evt_id",
+  "object": "event",
+  "api_version": "2020-03-02",
+  "created": 1590345637,
+  "data": {
+    "object": {
+      "id": "cs_test_CgXTnAZU4eCLcdnsYnaVtgYhUdMFQbaXdveOixNVTAhiwYBIZ7LIwfts",
+      "object": "checkout.session",
+      "billing_address_collection": null,
+      "cancel_url": "https://localhost/tickets/order_cancel",
+      "client_reference_id": "1",
+      "customer": "cus_HAkNOfmLiOp21w",
+      "customer_email": null,
+      "display_items": [
+        {
+          "amount": 2000,
+          "currency": "jpy",
+          "custom": {
+            "description": "Can be used to reserve 1x1H course",
+            "images": null,
+            "name": "1 Ticket"
+          },
+          "quantity": 1,
+          "type": "custom"
+        }
+      ],
+      "livemode": false,
+      "locale": null,
+      "metadata": {
+        "lot_size": "1"
+      },
+      "mode": "payment",
+      "payment_intent": "pi_1GmOk7AecOS1rtjr937D4BD9",
+      "payment_method_types": [
+        "card"
+      ],
+      "setup_intent": null,
+      "shipping": null,
+      "shipping_address_collection": null,
+      "submit_type": null,
+      "subscription": null,
+      "success_url": "https://localhost/tickets/order_success"
+    }
+  },
+  "livemode": false,
+  "pending_webhooks": 1,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "checkout.session.completed"
+}

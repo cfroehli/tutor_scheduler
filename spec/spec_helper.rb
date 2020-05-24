@@ -28,17 +28,22 @@ if ENV['COVERAGE']
 end
 
 require 'capybara/rspec'
+require 'billy/capybara/rspec'
 
 if ENV['USE_SELENIUM_CONTAINERS']
   Capybara.register_driver :selenium_container do |app|
     capabilities = Selenium::WebDriver::Remote::Capabilities.chrome(
       chromeOptions: {
-        args: %w[
+        args: %W[
+                 enable-features=NetworkService,NetworkServiceInProcess
+                 ignore-certificate-errors
+                 proxy-server=#{Billy.proxy.host}:#{Billy.proxy.port}
+                 proxy-bypass-list=127.0.0.1;localhost;#{Socket.gethostname}
                  no-sandbox
                  disable-gpu
                  disable-dev-shm-usage
-                 headless
                  window-size=1280x1024
+                 headless
                 ]
       }
     )
@@ -47,6 +52,8 @@ if ENV['USE_SELENIUM_CONTAINERS']
       url: 'http://selenium-server:4444/wd/hub',
       browser: :remote,
       desired_capabilities: capabilities,
+      clear_local_storage: true,
+      clear_session_storage: true
     )
   end
   Capybara.server_host = '0.0.0.0'

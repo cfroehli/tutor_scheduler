@@ -24,7 +24,7 @@ $(document).on("turbolinks:load", function() {
               window.location.reload();
             });
         }
-        
+
         function stripe_checkout(item) {
           window
             .fetch(config['create_session_url'], {
@@ -39,7 +39,7 @@ $(document).on("turbolinks:load", function() {
               var session_id = session_data['id'];
               if (session_id != null) {
                 stripe
-                  .redirectToCheckout({ sessionId: session_id })      
+                  .redirectToCheckout({ sessionId: session_id })
                   .then(function(result){
                     alert(result.error.message);
                   });
@@ -47,8 +47,8 @@ $(document).on("turbolinks:load", function() {
                 alert(session_data['msg']);
               }
             });
-        };        
-        
+        };
+
         $('a[data-stripe-item-id]').on('click', (event) => {
           event.preventDefault();
           var item = $(event.currentTarget).data();
@@ -58,8 +58,8 @@ $(document).on("turbolinks:load", function() {
             stripe_checkout(item);
           }
         });
-        
+
       });
-      $("#products").show();      
+      $("#products").show();
     });
 });

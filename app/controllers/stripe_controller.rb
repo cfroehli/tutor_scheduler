@@ -17,7 +17,7 @@ class StripeController < ApplicationController
       'checkout.session.completed' => :handle_checkout_session_completed,
       'invoice.payment_succeeded' => :handle_invoice_payment_succeeded,
     }
-  ).freeze
+  )
 
   def on_event
     head method(STRIPE_EVENT_HANDLERS[@event.type]).call
@@ -57,7 +57,7 @@ class StripeController < ApplicationController
     ['5 Tickets Bundle', 5, 7500],
   ].freeze
 
-  def self.setup_ticket_products
+  def self.setup_tickets_products
     product = Stripe::Product.create(
       {
         name: 'Course ticket',
