@@ -76,6 +76,9 @@ RSpec.configure do |config|
     FileUtils.rm_rf(Billy.config.certs_path)
     FileUtils.rm_rf(Billy.config.cache_path)
 
+    ARGV = [] # spawn_server attempt to parse rspec options and crash
+              # on --pattern => workaround by erasing argv here as
+              # rspec already parsed the command line
     StripeMock.spawn_server
   end
 

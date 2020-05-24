@@ -6,9 +6,9 @@ RSpec.describe 'Tickets', type: :system, js: true, mock_server: true do
   let(:user) { create(:user) }
 
   before do
+    intercept_stripe_js_load
     @stripe_client = StripeMock.start_client
     StripeController.setup_products
-    intercept_stripe_js_load
     sign_in user
   end
 
