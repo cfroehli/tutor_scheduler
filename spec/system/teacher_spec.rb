@@ -58,10 +58,11 @@ RSpec.describe 'Teacher', type: :system, js: true do
     end
 
     it 'can declare new slots' do
+      fill_in 'zoom_url', with: 'http://zoom.url/course'
       fill_in 'days', with: (Date.current + 11.days).strftime("%Y-%m-%d")
       click_on 'None selected'
+      expect(page).to have_text('Afternoon')
       click_on 'Afternoon'
-      fill_in 'zoom_url', with: 'http://zoom.url/course'
       expect do
         click_on 'Add'
         expect(page).to have_selector(:link_or_button, 'Add') # Force wait to bg request completion

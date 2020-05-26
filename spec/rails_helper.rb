@@ -83,6 +83,6 @@ RSpec.configure do |config|
   end
 
   config.after(:suite) do
-    StripeMock.kill_server
+    StripeMock.kill_server(StripeMock.default_server_pid_path)
   end
 end

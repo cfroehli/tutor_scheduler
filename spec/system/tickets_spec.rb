@@ -2,11 +2,10 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Tickets', type: :system, js: true, mock_server: true do
+RSpec.describe 'Tickets', type: :system, js: true do
   let(:user) { create(:user) }
 
   before do
-    intercept_stripe_js_load
     @stripe_client = StripeMock.start_client
     StripeController.setup_products
     sign_in user
@@ -15,6 +14,9 @@ RSpec.describe 'Tickets', type: :system, js: true, mock_server: true do
   after { StripeMock.stop_client(clear_server_data: true) }
 
   context 'when user access the tickets page' do
+    let(:product) { StripeController::STRIPE_PRODUCTS.first }
+    let(:plan) { StripeController::STRIPE_PLANS.first }
+
     before { visit new_ticket_path }
 
     it 'displays the available plans/products' do
@@ -27,43 +29,50 @@ RSpec.describe 'Tickets', type: :system, js: true, mock_server: true do
     end
 
     it 'can buy a ticket' do
-      product = StripeController::STRIPE_PRODUCTS.first
-      ticket_name = product[0]
-      lot_size = product[1]
-      click_on ticket_name
-      expect(page).to have_selector('div#stripe_params_tracker', text: 'sessionId', visible: :hidden)
-      event = StripeMock.mock_webhook_event('checkout.session.completed',
-                                            {
-                                              client_reference_id: user.id.to_s,
-                                              metadata: { lot_size: lot_size },
-                                            })
-      headers = stripe_event_headers(event.to_json)
+      expect(user.stripe_subscription_id).to be_nil
+      expect(user.stripe_plan_id).to be_nil
+
+      click_on product[0].to_s
+      session = retrieve_session_from_params_tracker
       expect do
-        post on_event_stripe_index_path, params: event, headers: headers, as: :json
-      end.to change(user, :remaining_tickets).by(lot_size)
+        send_product_checkout_completed_event(session)
+      end.to change(user, :remaining_tickets).by(session['metadata']['lot_size'])
       visit order_success_tickets_path
       expect(page).to have_current_path(courses_path)
-      expect(page).to have_text("Your order has been processed.")
+      expect(page).to have_text('Your order has been processed.')
+
+      expect(user.stripe_subscription_id).to be_nil
+      expect(user.stripe_plan_id).to be_nil
     end
 
     it 'can almost buy a ticket, but no thanks' do
-      product = StripeController::STRIPE_PRODUCTS.first
-      ticket_name = product[0]
+      expect(user.stripe_subscription_id).to be_nil
+      expect(user.stripe_plan_id).to be_nil
+
+      click_on product[0].to_s
+      retrieve_session_from_params_tracker
       expect do
-        click_on ticket_name
-        expect(page).to have_selector('div#stripe_params_tracker', text: 'sessionId', visible: :hidden)
-        visit order_cancel_tickets_path
-        expect(page).to have_current_path(courses_path)
-        expect(page).to have_text("Your order has been cancelled.")
-       end.to change(user, :remaining_tickets).by(0)
+        visit order_cancel_tickets_path # Mimic stripe form cancel click
+      end.to change(user, :remaining_tickets).by(0)
+      expect(page).to have_current_path(courses_path)
+      expect(page).to have_text('Your order has been cancelled.')
+
+      expect(user.stripe_subscription_id).to be_nil
+      expect(user.stripe_plan_id).to be_nil
     end
 
     xit 'can start a subscription' do
-      plan = StripeController::STRIPE_PLANS.first
-      plan_name = "#{plan[0]} per month"
-      click_on plan_name
-      expect(page).to have_selector('div#stripe_params_tracker', text: 'sessionId', visible: :hidden)
+      expect(user.stripe_subscription_id).to be_nil
+      expect(user.stripe_plan_id).to be_nil
 
+      click_on "#{plan[0]} per month"
+      session = retrieve_session_from_params_tracker
+      expect do
+        send_subscription_checkout_completed_event(session)
+      end.to change(user, :remaining_tickets).by(0)
+
+      expect(user.stripe_subscription_id).not_to be_nil
+      expect(user.stripe_plan_id).not_to be_nil
     end
   end
 end

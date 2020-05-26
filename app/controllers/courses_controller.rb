@@ -55,22 +55,19 @@ class CoursesController < ApplicationController
   end
 
   def create
-    days = params[:days].split(',')
-    hours = params[:hours]
+    days = params[:days].split(',').reject(&:blank?)
+    hours = params[:hours].reject(&:blank?).map(&:to_i).reject { |h| h < 7 || h > 22 }
     zoom_url = params[:zoom_url]
 
     no_error = true
     days.each do |day|
-      next if day.blank?
-
       hours.each do |hour|
-        next if hour.blank?
-
         time_slot = DateTime.parse("#{day} #{hour}")
         course = current_user.teacher_profile.courses.new(time_slot: time_slot, zoom_url: zoom_url)
         no_error &= course.save
       end
     end
+
     flash[:success] = 'Courses were successfully created.' if no_error
     redirect_back fallback_location: root_path
   end
@@ -90,7 +87,6 @@ class CoursesController < ApplicationController
     if @course.sign_up(current_user, params[:language_id])
       flash[:success] = "Signed up for a [#{@course.language.name}] course with [#{@course.teacher.name}] at [#{@course.time_slot.in_time_zone}]."
     end
-
     redirect_to courses_path
   end
 

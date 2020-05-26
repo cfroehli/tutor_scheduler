@@ -76,16 +76,14 @@
     %table{'data-toggle': 'table'}
       %thead
         %tr
-          %td.col-sm-2 Hour
-          %td.col-sm-10 Available Courses
+          %th.col-sm-2 Hour
+          %th.col-sm-10 Available Courses
       %tbody
-        - courses_slots = @courses.keys.sort.reject { |v| v < 7 }.reject { |v| v > 22 }
-        - (7..22).each do |slot|
+        - @courses.keys.sort.each do |slot|
           %tr
-          - if courses_slots.first == slot
-            - @courses[courses_slots.shift].each do |course|
-              %td= "#{slot}H00 ~ #{slot+1}H00"
-              %td
+            %td= "#{slot}H00 ~ #{slot+1}H00"
+            %td
+              - @courses[slot].each do |course|
                 - teacher = course.teacher
                 .col-sm-3
                   .card

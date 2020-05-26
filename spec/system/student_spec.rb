@@ -47,10 +47,15 @@ RSpec.describe 'Student', type: :system, js: true do
     end
 
     it 'can reserve a course' do
-      expect { click_on "[#{spanish.name}]", match: :first }
-        .to change(user, :remaining_tickets).by(-1)
-        .and change(ActionMailer::Base.deliveries, :count).by(2)
-      expect(page).to have_text("Signed up for a [#{spanish.name}] course with [#{teacher.name}] at [#{course.time_slot.in_time_zone}].")
+      expect do
+        click_on "[#{spanish.name}]", match: :first
+        expect(page).to have_text("Signed up for a [#{spanish.name}] course with [#{teacher.name}] at [#{course.time_slot.in_time_zone}].")
+      end
+        .to change(user, :remaining_tickets)
+        .by(-1)
+        .and change(ActionMailer::Base.deliveries, :count)
+        .by(2)
+
       course.reload
       expect(course.student).to eql(user)
       expect(course.language).to eql(spanish)
