@@ -59,7 +59,7 @@ RSpec.describe 'Teacher', type: :system, js: true do
 
     it 'can declare new slots' do
       fill_in 'zoom_url', with: 'http://zoom.url/course'
-      fill_in 'days', with: (Date.current + 11.days).strftime("%Y-%m-%d")
+      fill_in 'days', with: (Date.current + 11.days).strftime('%Y-%m-%d')
       click_on 'None selected'
       expect(page).to have_text('Afternoon')
       click_on 'Afternoon'

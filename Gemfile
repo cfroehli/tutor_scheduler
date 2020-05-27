@@ -65,7 +65,7 @@ group :development, :test do
 
   # stripe-mock
   gem 'puffing-billy', '~> 2.3.0'
-  gem 'stripe-ruby-mock', github: 'cfroehli/stripe-ruby-mock', :require => 'stripe_mock'
+  gem 'stripe-ruby-mock', github: 'cfroehli/stripe-ruby-mock', require: 'stripe_mock'
 end
 
 group :development do

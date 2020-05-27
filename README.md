@@ -17,6 +17,27 @@ This is just a sandbox project used while learning ruby/rails. Do not trust this
     ~~~
 
 # Notes about running system tests
+  * I have multiple network interfaces and the rails/selenium/proxy servers
+    may end up not seen each other. Depending on the configuration used, the correct
+    interface to use may not be autodetected. It is possible to force the address to
+    use by setting a few envvars. By default, it is assumed all the services are running
+    on localhost.
+    ~~~bash
+    # used by development server (rails s)
+    export RAILS_WEBSERVER_HOST="10.26.0.2"
+    # used by test runner (rails spec)
+    export RAILS_TEST_WEBSERVER_HOST="10.26.0.3"
+    # used to intercept external request while testing and mock
+    # 3rd party js service api
+    export RAILS_TEST_PROXY_HOST="10.26.0.4"
+    ~~~
+
+  * stripe api will require a salt to encrypt the tested event
+    production server are setup with Stripe generated keys, for the test environment
+    I just set some random value so the event can be generated/decoded without issue
+    ~~~bash
+    export STRIPE_ENDPOINT_SECRET="abc123"
+    ~~~
 
   * selenium containers config in docker compose
     ~~~yaml

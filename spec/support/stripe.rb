@@ -20,7 +20,7 @@ fake_stripe_script = <<~SCRIPT_END
           } }; }; })();
 SCRIPT_END
 
- # TODO: disable stub when stripe-mock is running in live mode?
+# TODO: maybe disable stub when stripe-mock is running in live mode?
 puts 'Installing stripeJS stub'
 Billy.proxy.stub('https://js.stripe.com:443/v3')
      .and_return(content_type: 'application/javascript',
@@ -46,8 +46,13 @@ module StripeTestHelpers
   end
 
   def create_customer(session)
-    customer = Stripe::Customer.create({ email: session['customer_email'], currency: 'jpy' })
-    #puts customer
+    customer = Stripe::Customer.create(
+      {
+        email: session['customer_email'],
+        source: StripeMock.generate_card_token,
+        currency: 'jpy',
+      }
+    )
     customer.id
   end
 
@@ -55,16 +60,15 @@ module StripeTestHelpers
     session['customer'] || create_customer(session)
   end
 
-  def send_checkout_completed_event(params)
-    event = StripeMock.mock_webhook_event('checkout.session.completed', params)
-    #puts '---------'
-    #puts event
+  def send_event(event_name, params)
+    event = StripeMock.mock_webhook_event(event_name, params)
     headers = stripe_event_headers(event.to_json)
     post on_event_stripe_index_path, params: event, headers: headers, as: :json
   end
 
-  def send_product_checkout_completed_event(session)
-    send_checkout_completed_event(
+  def send_product_checkout_completed_event(session) # rubocop:disable Metric/MethodLength
+    send_event(
+      'checkout.session.completed',
       {
         customer: get_or_create_customer(session),
         client_reference_id: session.client_reference_id,
@@ -89,8 +93,7 @@ module StripeTestHelpers
     )
   end
 
-  def send_subscription_checkout_completed_event(session)
-    puts session
+  def send_subscription_checkout_completed_event(session) # rubocop:disable Metric/MethodLength
     customer = get_or_create_customer(session)
     items = session['subscription_data']['items']
 
@@ -107,17 +110,26 @@ module StripeTestHelpers
       }
     )
 
-    send_checkout_completed_event(
+    send_event(
+      'checkout.session.completed',
       {
         customer: customer,
         client_reference_id: session['client_reference_id'],
         display_items: subscription.items.data,
         mode: session.mode,
-        subscription: session.subscription,
+        subscription: subscription.id,
         payment_intent: session.payment_intent,
         payment_method_types: session.payment_method_types,
         metadata: session.metadata,
       }
     )
+  end
+
+  def send_subscription_payment_success_event(subscription_id)
+    subscription = Stripe::Subscription.retrieve(subscription_id)
+    invoice = Stripe::Invoice.upcoming(customer: subscription['customer'])
+    event_object = invoice.to_hash
+    event_object[:lines][:data][0][:subscription] = subscription['id']
+    send_event('invoice.payment_succeeded', event_object)
   end
 end

@@ -35,7 +35,7 @@ RSpec.describe 'Admin', type: :system, js: true do
       expect(page).to have_text("You are currently signed in as [#{user_name}] - Cancel impersonation")
       click_on 'Cancel impersonation'
       expect(page).to have_text("#{admin.username}'s dashboard")
-      expect(page).not_to have_text("You are currently signed in as")
+      expect(page).not_to have_text('You are currently signed in as')
       expect(page).to have_text('Admin')
     end
 
@@ -48,13 +48,13 @@ RSpec.describe 'Admin', type: :system, js: true do
       end
       select teacher.user.username, from: 'user'
       select language_name, from: 'language'
-      expect {
+      expect do
         click_on 'Add'
         within('#active-languages') do
           expect(page).to have_text(teacher.name)
           expect(page).to have_text(language_name)
         end
-      }.to change(teacher.languages, :count).by(1)
+      end.to change(teacher.languages, :count).by(1)
     end
 
     it 'can register a new teacher' do
@@ -66,13 +66,13 @@ RSpec.describe 'Admin', type: :system, js: true do
       end
       select wannabe_teacher.username, from: 'user'
       select language_name, from: 'language'
-      expect {
+      expect do
         click_on 'Add'
         within('#active-languages') do
           expect(page).to have_text(wannabe_teacher.teacher_profile.name)
           expect(page).to have_text(language_name)
         end
-      }.to change(Teacher, :count).by(1)
+      end.to change(Teacher, :count).by(1)
     end
 
     it 'can enable/disable a language' do
