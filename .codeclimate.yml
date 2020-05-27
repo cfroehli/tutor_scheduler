@@ -1,0 +1,15 @@
+version: "2"
+plugins:
+  bundler-audit:
+    enabled: true
+  flog:
+    enabled: true
+  haml-lint:
+    enabled: true
+  reek:
+    enabled: true
+  rubocop:
+    enabled: true
+    channel: "rubocop-0-83"
+    config:
+      file: .codeclimate.rubocop.yml
