@@ -50,7 +50,7 @@ RSpec.describe 'Tickets', type: :system, js: true do
       end.to not_change(user, :stripe_subscription_id).and not_change(user, :stripe_plan_id)
     end
 
-    it 'can start a subscription' do
+    it 'can start/stop a subscription' do
       expect(user.stripe_subscription_id).to be_nil
       expect(user.stripe_plan_id).to be_nil
 
@@ -66,6 +66,28 @@ RSpec.describe 'Tickets', type: :system, js: true do
 
       expect { send_subscription_payment_success_event(user.stripe_subscription_id) }
         .to change(user, :remaining_tickets).by(plan[1])
+
+      visit new_ticket_path
+      StripeController.available_products.each do |p|
+        if p[:type] == :subscription
+          expect(page).not_to have_text(p[:name])
+        else
+          expect(page).to have_text(p[:name])
+        end
+      end
+
+      expect do
+        click_on 'Cancel current plan'
+        expect(accept_alert).to eq('Current plan cancelled')
+        expect(page).to have_current_path(new_ticket_path)
+        StripeController.available_products.each do |p|
+          expect(page).to have_text(p[:name])
+        end
+      end.not_to change(user, :remaining_tickets)
+
+      user.reload
+      expect(user.stripe_subscription_id).to be_nil
+      expect(user.stripe_plan_id).to be_nil
     end
   end
 end
