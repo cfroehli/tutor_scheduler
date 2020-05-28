@@ -13,9 +13,19 @@ directories:
       enabled: false
     UtilityFunction:
       enabled: false
+  "app/jobs":
+    IrresponsibleModule:
+      enabled: false
   "app/mailers":
+    IrresponsibleModule:
+      enabled: false
     InstanceVariableAssumption:
       enabled: false
   "app/models":
+    IrresponsibleModule:
+      enabled: false
     InstanceVariableAssumption:
+      enabled: false
+  "app/uploaders":
+    IrresponsibleModule:
       enabled: false

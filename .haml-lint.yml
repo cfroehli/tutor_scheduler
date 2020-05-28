@@ -8,6 +8,12 @@ linters:
   ConsecutiveComments:
     enabled: false
 
+  IdNames:
+    enabled: false
+
+  InlineStyles:
+    enabled: false
+
   LeadingCommentSpace:
     enabled: false
 
