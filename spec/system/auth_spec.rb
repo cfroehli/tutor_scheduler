@@ -12,7 +12,7 @@ RSpec.describe 'Authentication flow:', type: :system, js: true do
       expect(page).to have_current_path(new_user_session_path)
     end
 
-     it 'can login with correct credentials' do
+    it 'can login with correct credentials' do
       fill_in 'user_login', with: user.username
       fill_in 'user_password', with: user.password
       click_on 'Log in'
