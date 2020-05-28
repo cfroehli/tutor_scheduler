@@ -3,11 +3,35 @@
 require 'rails_helper'
 
 RSpec.describe 'Authentication flow:', type: :system, js: true do
-  let(:user) { build(:user) }
+  let(:user) { create(:user) }
 
   context 'when user is not logged' do
+    before { visit root_path }
+
     it 'will redirect to login page' do
-      visit root_path
+      expect(page).to have_current_path(new_user_session_path)
+    end
+
+     it 'can login with correct credentials' do
+      fill_in 'user_login', with: user.username
+      fill_in 'user_password', with: user.password
+      click_on 'Log in'
+      expect(page).to have_current_path(root_path)
+    end
+
+    it 'cant login with incorrect password' do
+      fill_in 'user_login', with: user.username
+      fill_in 'user_password', with: 'WrongPassword'
+      click_on 'Log in'
+      expect(page).to have_text('Invalid Login or password.')
+      expect(page).to have_current_path(new_user_session_path)
+    end
+
+    it 'cant login with incorrect username' do
+      fill_in 'user_login', with: 'UnknownUser'
+      fill_in 'user_password', with: 'UnknownUserPassword'
+      click_on 'Log in'
+      expect(page).to have_text('Invalid Login or password.')
       expect(page).to have_current_path(new_user_session_path)
     end
   end
