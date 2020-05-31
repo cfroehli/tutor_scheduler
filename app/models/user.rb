@@ -42,6 +42,16 @@ class User < ApplicationRecord
     end
   end
 
+  def has_stripe_subscription
+    stripe_subscription_id.present?
+  end
+
+  def set_stripe_subscription(subscription_id, plan_id)
+    self.stripe_subscription_id = subscription_id
+    self.stripe_plan_id = plan_id
+    self.save
+  end
+
   def use_ticket
     self.transaction do
       ticket = tickets.valid.order('expiration ASC NULLS LAST').first

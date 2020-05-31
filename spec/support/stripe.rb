@@ -30,9 +30,16 @@ Billy.proxy.reset_cache
 puts "Proxing external requests to #{Billy.proxy.host}:#{Billy.proxy.port}"
 
 module StripeTestHelpers
-  def stripe_event_headers(event_json)
+  _forced_stripe_endpoint_secret = nil
+  define_method(:with_stripe_endpoint_secret) do |stripe_endpoint_secret, &block|
+    _forced_stripe_endpoint_secret = stripe_endpoint_secret
+    block.call
+    _forced_stripe_endpoint_secret = nil
+  end
+
+  define_method(:stripe_event_headers) do |event_json|
     timestamp = Time.current
-    secret = ENV['STRIPE_ENDPOINT_SECRET']
+    secret = _forced_stripe_endpoint_secret || ENV['STRIPE_ENDPOINT_SECRET']
     signature = Stripe::Webhook::Signature.compute_signature(timestamp, event_json, secret)
     scheme = Stripe::Webhook::Signature::EXPECTED_SCHEME
     { "Stripe-Signature": Stripe::Webhook::Signature.generate_header(timestamp, signature, scheme: scheme) }

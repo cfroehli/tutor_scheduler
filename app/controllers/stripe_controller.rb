@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'ostruct'
-
 class StripeController < ApplicationController
   include ::TutorScheduler::Stripe
 
@@ -13,32 +11,12 @@ class StripeController < ApplicationController
     @session = create_stripe_session(item_type, item_id, :tickets)
   end
 
-  def cancel_subscription
-    _do_cancel_subscription
-  end
-
   private
 
   def ensure_new_subscription_required
-    return if current_user.stripe_subscription_id.blank?
+    return unless current_user.has_stripe_subscription
 
-    if current_user.stripe_plan_id == params['stripeItemId']
-      @session = ::OpenStruct.new({ id: nil, msg: 'This plan is already active' })
-      render :create
-    end
-
-    _do_cancel_subscription
-  end
-
-  def _do_cancel_subscription
-    current_subscription = current_user.stripe_subscription_id
-    return if current_subscription.blank?
-
-    ::Stripe::Subscription.delete(current_subscription)
-
-    current_user.stripe_plan_id = nil
-    current_user.stripe_subscription_id = nil
-    current_user.save
+    head :bad_request
   end
 
   def handle_checkout_session_completed(event)
@@ -51,11 +29,11 @@ class StripeController < ApplicationController
     if checkout_session.subscription.blank?
       ticket_count = checkout_session.metadata[:lot_size].to_i
       user.add_tickets(ticket_count)
+      user.save
     else
-      user.stripe_subscription_id = checkout_session.subscription
-      user.stripe_plan_id = checkout_session.display_items[0].plan.id
+      user.set_stripe_subscription(checkout_session.subscription,
+                                   checkout_session.display_items[0].plan.id)
     end
-    user.save
 
     :accepted
   end

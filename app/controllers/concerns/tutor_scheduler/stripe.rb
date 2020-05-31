@@ -51,6 +51,14 @@ module TutorScheduler
       ::Stripe::Checkout::Session.create(session_data)
     end
 
+    def cancel_subscription
+      return unless current_user.has_stripe_subscription
+
+      ::Stripe::Subscription.delete(current_user.stripe_subscription_id)
+      current_user.set_stripe_subscription(nil, nil)
+      current_user.save
+    end
+
     def on_event
       sig_header = request.env['HTTP_STRIPE_SIGNATURE']
       begin
@@ -64,16 +72,8 @@ module TutorScheduler
     end
 
     def handle_unknown_event(event)
-      logger.warning("Unhandled event: #{event.fetch('type', 'Unknown event type')}")
+      logger.warn("Unhandled event: #{event.type}")
       :bad_request
-    end
-
-    def handle_checkout_session_completed(event)
-      raise 'handle_checkout_session_completed NYI'
-    end
-
-    def handle_invoice_payment_succeeded(event)
-      raise 'handle_invoice_payment_succeeded NYI'
     end
 
     def self.create_stripe_session_data(user, success_url, cancel_url)

@@ -7,6 +7,7 @@ RSpec.describe 'Student', type: :system, js: true do
   let(:english) { create(:language, :english) }
   let(:spanish) { create(:language, :spanish) }
   let!(:teacher) { create(:teacher_with_courses, languages: [english, spanish]) }
+  let(:course) { teacher.courses.order(time_slot: :asc).first }
 
   before { sign_in user }
 
@@ -39,8 +40,6 @@ RSpec.describe 'Student', type: :system, js: true do
   end
 
   context 'when a ticket is available' do
-    let(:course) { teacher.courses.order(time_slot: :asc).first }
-
     before do
       user.add_tickets(1)
       open_course_reservation_page(course)
@@ -59,6 +58,17 @@ RSpec.describe 'Student', type: :system, js: true do
       course.reload
       expect(course.student).to eql(user)
       expect(course.language).to eql(spanish)
+    end
+
+    it 'cant bypass ticket count verification' do
+      expect(page).to have_text("[#{spanish.name}]") # Load page
+      user.use_ticket while user.remaining_tickets > 0 # Use available ticket on another tab
+      expect do # then come back and click to sign up
+        click_on "[#{spanish.name}]", match: :first
+        expect(page).to have_text('You need a ticket to reserve a course.')
+      end
+        .to change(user, :remaining_tickets)
+        .by(0)
     end
   end
 
