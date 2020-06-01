@@ -23,6 +23,6 @@ class RolifyCreateRoles < ActiveRecord::Migration[6.0]
       user.add_role(user.admin? ? :admin : :user)
     end
 
-    remove_column :users, :admin
+    remove_column :users, :admin, :boolean
   end
 end

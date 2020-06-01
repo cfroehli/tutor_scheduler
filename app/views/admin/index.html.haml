@@ -20,9 +20,9 @@
       = form_with url: add_language_teachers_path do |f|
         .row
           = f.label :user, class: 'form-control col-sm-2'
-          = f.collection_select :user, User.all, :id, :username, {}, {class: 'form-control col-sm-4'}
+          = f.collection_select :user, User.all, :id, :username, {}, { class: 'form-control col-sm-4' }
           = f.label :language, class: 'form-control col-sm-2'
-          = f.collection_select :language, Language.all, :id, :name, {}, {class: 'form-control col-sm-4'}
+          = f.collection_select :language, Language.all, :id, :name, {}, { class: 'form-control col-sm-4' }
 
         .text-center
           = f.button 'Add', class: 'btn btn-primary'
@@ -34,7 +34,7 @@
   .card-header Active languages
   .card-body
     .card-text
-      %table#active_lang{'data-toggle': 'table'}
+      %table#active_lang{ 'data-toggle': 'table' }
         %thead
           %tr
             %th Teacher
@@ -55,7 +55,7 @@
   .card-header Inactive languages
   .card-body
     .card-text
-      %table#inactive_lang{'data-toggle': 'table'}
+      %table#inactive_lang{ 'data-toggle': 'table' }
         %thead
           %tr
             %th Teacher

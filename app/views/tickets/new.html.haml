@@ -3,12 +3,13 @@
 - content_for :packs, 'stripe'
 - content_for :no_css_packs, 'stripe'
 
-#stripe{data: {'new-url': new_stripe_path}}
+#stripe{ data: { 'new-url': new_stripe_path } }
 
-#products{style: "display:none;"}
+#products{ style: 'display:none;' }
   - current_plan = current_user.stripe_plan_id
-  - unless current_plan.nil?
-    %a{href: "#", data: {'stripe-item-id': "#{current_plan}", 'stripe-item-type': "cancel"}}
+  - if current_plan
+    %a{ href: '#', data: { 'stripe-item-id': current_plan.to_s,
+                           'stripe-item-type': 'cancel' } }
       .card
         .card-header
           %i.fas.fa-ticket-alt.fa-2x
@@ -16,16 +17,16 @@
     %br/
 
   - StripeController.available_products.each do |product|
-    - next if (not current_plan.nil? and (product[:type] == :subscription))
-    %a{href: "#", data: {'stripe-item-id': "#{product[:id]}", 'stripe-item-type': "#{product[:type]}"}}
+    - next if current_plan && (product[:type] == :subscription)
+
+    %a{ href: '#', data: { 'stripe-item-id': product[:id].to_s,
+                           'stripe-item-type': product[:type].to_s } }
       .card
         .card-header
           .float-left
             %i.fas.fa-ticket-alt.fa-2x
-            = product[:name]
-          .float-right
-            = product[:price]
+            = product[:name].to_s
+          .float-right= product[:price].to_s
           .clearfix
-        .card-body
-          = product[:description]
+        .card-body= product[:description].to_s
     %br/

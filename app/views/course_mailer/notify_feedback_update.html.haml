@@ -5,4 +5,4 @@
   Teacher #{@course.teacher.name} updated the feedback on #{@course.language.name} course from #{@course.time_slot}.
 
 %p
-  #{@course.feedback}
+  @course.feedback.to_s

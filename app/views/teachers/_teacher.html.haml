@@ -1,10 +1,9 @@
 .card
   .card-header
     .float-left
-      - unless teacher.image.blank?
-        = cl_image_tag teacher.image, secure:true
-      = link_to teacher_path(teacher) do
-        = teacher.name
+      - if teacher.image.present?
+        = cl_image_tag teacher.image, secure: true
+      = link_to teacher.name, teacher_path(teacher)
     .float-right
       - if current_user.id == teacher.user.id
         = link_to edit_teacher_path(teacher) do
@@ -14,9 +13,7 @@
     .row
       Teached languages :
       %ul
-        - teacher.languages.each do | teached_language |
+        - teacher.languages.each do |teached_language|
           %li= teached_language.name
-
     .row
-      .col-sm-12
-        = teacher.presentation
+      .col-sm-12= teacher.presentation

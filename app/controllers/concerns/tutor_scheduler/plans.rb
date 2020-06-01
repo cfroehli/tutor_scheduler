@@ -43,11 +43,11 @@ module TutorScheduler
     end
 
     def self.create(item_id)
-      stripe_plan = ::Stripe::Plan.retrieve(item_id)
+      plan = ::Stripe::Plan.retrieve(item_id)
       {
         mode: 'subscription',
-        subscription_data: { items: [{ plan: stripe_plan.id, quantity: 1 }] },
-        metadata: { lot_size: stripe_plan.metadata[:lot_size] },
+        subscription_data: { items: [{ plan: plan.id, quantity: 1 }] },
+        metadata: { lot_size: plan.metadata[:lot_size] },
       }
     end
   end

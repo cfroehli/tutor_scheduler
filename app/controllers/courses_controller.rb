@@ -56,7 +56,7 @@ class CoursesController < ApplicationController
 
   def create
     days = params[:days].split(',').reject(&:blank?)
-    hours = params[:hours].reject(&:blank?).map(&:to_i).reject { |h| h < 7 || h > 22 }
+    hours = params[:hours].reject(&:blank?).map(&:to_i).reject { |hour| hour < 7 || hour > 22 }
     zoom_url = params[:zoom_url]
 
     no_error = true

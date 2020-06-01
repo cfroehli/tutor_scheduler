@@ -73,7 +73,7 @@ module StripeTestHelpers
     post on_event_stripe_index_path, params: event, headers: headers, as: :json
   end
 
-  def send_product_checkout_completed_event(session) # rubocop:disable Metric/MethodLength
+  def send_product_checkout_completed_event(session) # rubocop:disable Metrics/MethodLength
     send_event(
       'checkout.session.completed',
       {

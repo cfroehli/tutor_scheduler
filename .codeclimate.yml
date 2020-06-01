@@ -2,8 +2,6 @@ version: "2"
 plugins:
   bundler-audit:
     enabled: true
-  flog:
-    enabled: true
   haml-lint:
     enabled: true
   reek:

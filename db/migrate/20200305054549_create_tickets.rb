@@ -20,6 +20,6 @@ class CreateTickets < ActiveRecord::Migration[6.0]
       end
     end
 
-    remove_column :users, :old_tickets
+    remove_column :users, :old_tickets, :integer
   end
 end

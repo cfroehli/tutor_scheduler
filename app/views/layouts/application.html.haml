@@ -1,29 +1,28 @@
 !!!
 %html
   %head
-    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %meta{content: 'text/html; charset=UTF-8', 'http-equiv': 'Content-Type'}/
     %title TutorScheduler
     = csrf_meta_tags
     = csp_meta_tag
 
-    - packs = ([ 'common' ] + (content_for(:packs) || '').split(/,/)).uniq
-    = javascript_packs_with_chunks_tag *packs, 'data-turbolinks-track': 'reload', defer: true
+    - packs = (['common'] + (content_for(:packs) || '').split(/,/)).uniq
+    = javascript_packs_with_chunks_tag(*packs, 'data-turbolinks-track': 'reload', defer: true)
     = yield :extra_js
     - no_css_packs = (content_for(:no_css_packs) || '').split(/,/).uniq
-    - packs = packs.filter {|pack| !no_css_packs.include? pack}
-    = stylesheet_packs_with_chunks_tag *packs, media: 'all', 'data-turbolinks-track': 'reload'
+    - packs = packs.filter { |pack| !no_css_packs.include? pack }
+    = stylesheet_packs_with_chunks_tag(*packs, media: 'all', 'data-turbolinks-track': 'reload')
     = yield :extra_styles
-
   %body
     .container
       %nav.navbar.navbar-expand-lg.navbar-light.bg-light
         %span.navbar-brand.mb-0.h1 Tutor Scheduler
         %button.navbar-toggler{type: 'button',
-                               data: {toggle: 'collapse',
-                                      target: '#navbarNav'},
-                               aria: {controls: 'navbarNav',
-                                      expanded: 'false',
-                                      label: 'Toggle navigation'}}
+                               data: { toggle: 'collapse',
+                                       target: '#navbarNav' },
+                               aria: { controls: 'navbarNav',
+                                       expanded: 'false',
+                                       label: 'Toggle navigation' } }
           %span.navbar-toggler-icon
         .navbar-collapse.collapse#navbarNav
           .navbar-nav
@@ -54,9 +53,7 @@
               = link_to destroy_user_session_path, class: 'nav-item nav-link', method: :delete do
                 %i.fas.fa-sign-out-alt
                 Logout
-
       %br/
-
       - flash.each do |flash_type, flash_content|
         .alert{class: "alert-#{flash_type} alert-dismissible fade show",
                role: 'alert'}
@@ -66,12 +63,9 @@
                         'aria-label': 'Close'}
             %span{'aria-hidden': 'true'}
               &times;
-
       = yield
-
       - if current_user != true_user
         .text-center.text-danger
-          = "-o-o-"
-          = "You are currently signed in as [#{current_user.username}] - "
-          = link_to "Cancel impersonation", stop_impersonating_admin_index_path, method: :post
-          = "-o-o-"
+          o-o-o You are currently signed in as [#{current_user.username}] -
+          = link_to 'Cancel impersonation', stop_impersonating_admin_index_path, method: :post
+          o-o-o

@@ -12,9 +12,7 @@ class User < ApplicationRecord
   has_one :teacher_profile, class_name: 'Teacher'
   has_many :courses, foreign_key: 'student_id', inverse_of: :student
 
-  has_many :tickets
-
-  attr_writer :login
+  has_many :tickets, dependent: :destroy
 
   after_create do
     # New user got free tickets to try our service
@@ -24,22 +22,16 @@ class User < ApplicationRecord
     add_role(:user)
   end
 
+  attr_writer :login
+
   def login
     @login || username || email
   end
 
   def self.find_first_by_auth_conditions(warden_conditions)
     conditions = warden_conditions.dup
-    if (login = conditions.delete(:login))
-      where(conditions).find_by(['lower(username) = :value OR lower(email) = :value', { value: login.downcase }])
-    else
-      username = conditions[:username]
-      if username.nil?
-        find_by(conditions)
-      else
-        find_by(username: conditions[:username])
-      end
-    end
+    login = conditions.delete(:login)
+    where(conditions).find_by(['lower(username) = :value OR lower(email) = :value', { value: login.downcase }])
   end
 
   def has_stripe_subscription

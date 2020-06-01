@@ -52,6 +52,7 @@ RSpec.describe 'Teacher', type: :system, js: true do
       find('.card i.fa.fa-edit').click
       expect(page).to have_text('Update teaching profile')
       fill_in 'teacher-presentation-area', with: "This is #{teacher.name}'s presentation."
+      page.attach_file(Rails.root.join('spec/fixtures/spintop.jpg'), make_visible: true)
       click_on 'Submit'
       expect(page).to have_current_path(teacher_path(teacher.id))
       expect(page).to have_text("This is #{teacher.name}'s presentation.")
@@ -84,7 +85,7 @@ RSpec.describe 'Teacher', type: :system, js: true do
       expect(page).to have_current_path(courses_history_user_path(student.id))
     end
 
-    context 'and is past' do
+    context 'when past' do
       before do
         course.update(time_slot: course.time_slot - 5.days)
         visit teacher_path(teacher.id)

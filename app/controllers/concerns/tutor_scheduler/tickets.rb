@@ -33,28 +33,30 @@ module TutorScheduler
       ::Stripe::SKU
         .list
         .map do |sku|
+          attributes = sku.attributes
           {
             id: sku.id,
             type: :product,
-            name: sku.attributes.name,
+            name: attributes.name,
             price: "#{sku.price}￥ (+税)",
-            description: "Allow to reserve #{sku.attributes.lot_size} x 1H course.",
+            description: "Allow to reserve #{attributes.lot_size} x 1H course.",
           }
         end
     end
 
     def self.create(item_id)
-      stripe_sku = ::Stripe::SKU.retrieve(item_id)
+      sku = ::Stripe::SKU.retrieve(item_id)
+      attributes = sku.attributes
       {
         mode: 'payment',
         line_items: [{
-          name: stripe_sku.attributes[:name],
-          amount: stripe_sku[:price],
-          description: "Can be used to reserve #{stripe_sku.attributes[:lot_size]}x1H course",
+          name: attributes[:name],
+          amount: sku[:price],
+          description: "Can be used to reserve #{attributes[:lot_size]}x1H course",
           currency: 'jpy',
           quantity: 1,
         }],
-        metadata: { lot_size: stripe_sku.attributes[:lot_size] },
+        metadata: { lot_size: attributes[:lot_size] },
       }
     end
   end

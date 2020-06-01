@@ -25,13 +25,16 @@ RSpec.describe 'Tickets', type: :system, js: true do
       end
     end
 
-    it 'can buy a ticket' do
+    it 'can buy tickets' do
       RSpec::Matchers.define_negated_matcher :not_change, :change
       expect do
         click_on product[0].to_s
         session = retrieve_session_from_params_tracker
         expect { send_product_checkout_completed_event(session) }
-          .to change(user, :remaining_tickets).by(session['metadata']['lot_size'])
+          .to change(user, :remaining_tickets)
+          .by(session['metadata']['lot_size'])
+        user.reload
+        expect(user.stripe_user_id).not_to be_nil
         visit order_success_tickets_path
         expect(page).to have_current_path(courses_path)
         expect(page).to have_text('Your order has been processed.')

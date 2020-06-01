@@ -1,79 +1,66 @@
 %h3.text-center Sign up for a course
-
 - remaining_tickets = current_user.remaining_tickets
-= "Remaining tickets : #{remaining_tickets}"
-
+Remaining tickets : #{remaining_tickets}
 %hr/
-- if remaining_tickets > 0
+- if remaining_tickets.positive?
   - if @years.empty?
     - if @year
       %span &#47;
-      = link_to courses_path(language: @lang_code, teacher: @teacher_name, year: @year) do
-        = @year
+      = link_to @year.to_s, courses_path(language: @lang_code, teacher: @teacher_name, year: @year)
       - if @months.empty?
         %span &#47;
-        = link_to courses_path(language: @lang_code, teacher: @teacher_name, year: @year, month: @month) do
-          = @month
+        = link_to @month.to_s, courses_path(language: @lang_code, teacher: @teacher_name, year: @year, month: @month)
         - if @days.empty?
           %span &#47;
-          = link_to courses_path(language: @lang_code, teacher: @teacher_name, year: @year, month: @month) do
-            = @day
+          = link_to @day.to_s, courses_path(language: @lang_code, teacher: @teacher_name, year: @year, month: @month)
         - else
           %br/
-          Choose a day :
-          - @days.each do |day|
-            = link_to courses_path(language: @lang_code, teacher: @teacher_name, year: @year, month: @month, day: day) do
-              = day
+          .day-selection
+            Choose a day :
+            - @days.each do |day|
+              = link_to day.to_s, courses_path(language: @lang_code, teacher: @teacher_name, year: @year, month: @month, day: day)
       - else
         %br/
-        Choose a month :
-        - @months.each do |month|
-          = link_to courses_path(language: @lang_code, teacher: @teacher_name, year: @year, month: month) do
-            = month
+        .month-selection
+          Choose a month :
+          - @months.each do |month|
+            = link_to month.to_s, courses_path(language: @lang_code, teacher: @teacher_name, year: @year, month: month)
     - else
       No course available.
-  -else
-    - content_for :packs, 'tutor-scheduler-courses'
-    - content_for :no_css_packs, 'tutor-scheduler-courses'
-
+  - else
+    :ruby
+      content_for :packs, 'tutor-scheduler-courses'
+      content_for :no_css_packs, 'tutor-scheduler-courses'
     .form-inline
       - teachers = Teacher.where(courses: Course.available)
       .col-sm-2
         Filter by :
-
       .dropdown.col-sm-5
-        %button.btn.btn-primary.dropdown-toggle#teacher_filter{type: 'button', 'data-toggle': 'dropdown', aria: {haspopup: 'true', expanded: 'false'}}
-          = "Teacher: #{@teacher_name or 'No filter'}"
-          .dropdown-menu{'aria-labelledby': 'teacher_filter'}
-            = link_to courses_path(language: @lang_code, teacher: nil), class: "dropdown-item #{'active' if @teacher_name.nil?}" do
-              No filter
+        %button.btn.btn-primary.dropdown-toggle#teacher_filter{ type: 'button', 'data-toggle': 'dropdown', aria: { haspopup: 'true', expanded: 'false' } }
+          Teacher: #{@teacher_name || 'No filter'}
+          .dropdown-menu{ 'aria-labelledby': 'teacher_filter' }
+            = link_to 'No filter', courses_path(language: @lang_code, teacher: nil), class: "dropdown-item #{'active' if @teacher_name.nil?}"
             .dropdown-divider
             - teachers.pluck(:name).each do |teacher_name|
-              = link_to courses_path(language: @lang_code, teacher: teacher_name), class: "dropdown-item #{'active' if @teacher_name == teacher_name}" do
-                = teacher_name
-
+              = link_to teacher_name.to_s, courses_path(language: @lang_code, teacher: teacher_name),
+                class: "dropdown-item #{'active' if @teacher_name == teacher_name}"
       .dropdown.col-sm-5
-        %button.btn.btn-primary.dropdown-toggle#lang_filter{type: 'button', 'data-toggle': 'dropdown', aria: {haspopup: 'true', expanded: 'false'}}
-          Language
-          = "Language: #{@lang_code or 'No filter'}"
-          .dropdown-menu{'aria-labelledby': 'lang_filter'}
+        %button.btn.btn-primary.dropdown-toggle#lang_filter{ type: 'button', 'data-toggle': 'dropdown', aria: { haspopup: 'true', expanded: 'false' } }
+          Language: #{@lang_code || 'No filter'}
+          .dropdown-menu{ 'aria-labelledby': 'lang_filter' }
             = link_to courses_path(language: nil, teacher: @teacher_name), class: "dropdown-item #{'active' if @lang_code.nil?}" do
               No filter
             - TeachedLanguage.active.where(teacher: teachers).joins(:language).distinct.pluck(:code, :name).each do |lang_code, lang_name|
-              = link_to courses_path(language: lang_code, teacher: @teacher_name), class: "dropdown-item #{'active' if @lang_code == lang_code}" do
-                = lang_name
-
+              = link_to lang_name, courses_path(language: lang_code, teacher: @teacher_name), class: "dropdown-item #{'active' if @lang_code == lang_code}"
     %br/
-    Choose a year :
-    - @years.each do |year|
-      = link_to courses_path(language: @lang_code, teacher: @teacher_name, year: year) do
-        = year
-
+    .year-selection
+      Choose a year :
+      - @years.each do |year|
+        = link_to year.to_s, courses_path(language: @lang_code, teacher: @teacher_name, year: year)
   %hr/
   - unless @courses.empty?
     - content_for :packs, 'bootstrap-table'
-
-    %table{'data-toggle': 'table'}
+    %table{ 'data-toggle': 'table' }
       %thead
         %tr
           %th.col-sm-2 Hour
@@ -81,7 +68,7 @@
       %tbody
         - @courses.keys.sort.each do |slot|
           %tr
-            %td= "#{slot}H00 ~ #{slot+1}H00"
+            %td #{slot}H00 ~ #{slot + 1}H00
             %td
               - @courses[slot].each do |course|
                 - teacher = course.teacher
@@ -89,19 +76,16 @@
                   .card
                     .card-header
                       Teacher
-                      = link_to teacher_path(teacher) do
-                        = teacher.user.username
+                      = link_to teacher.user.username.to_s, teacher_path(teacher)
                     .card-body
-                      - languages = teacher.languages
-                      - languages = languages.where(code: @lang_code) unless @lang_code.nil?
+                      :ruby
+                        languages = teacher.languages
+                        languages = languages.where(code: @lang_code) unless @lang_code.nil?
                       - languages.each do |language|
                         .card-text
-                          = link_to sign_up_course_path(course, language_id: language.id), method: :post do
-                            = "[#{language.name}]"
+                          = link_to "[#{language.name}]", sign_up_course_path(course, language_id: language.id), method: :post
 
 - else
-
   You need to
-  = link_to new_ticket_path do
-    buy at least one ticket
+  = link_to 'buy at least one ticket', new_ticket_path
   to be able to reserve a course.
