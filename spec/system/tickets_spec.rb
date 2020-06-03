@@ -41,6 +41,14 @@ RSpec.describe 'Tickets', type: :system, js: true do
       end.to not_change(user, :stripe_subscription_id).and not_change(user, :stripe_plan_id)
     end
 
+    it 'reuse stripe customer info when available' do
+      user.stripe_user_id = 'stripe_user_id'
+      user.save
+      click_on product[0].to_s
+      session = retrieve_session_from_params_tracker
+      expect(session['customer']).to eql(user.stripe_user_id)
+    end
+
     it 'can almost buy a ticket, but no thanks' do
       RSpec::Matchers.define_negated_matcher :not_change, :change
       expect do
