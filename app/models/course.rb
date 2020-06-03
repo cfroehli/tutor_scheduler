@@ -13,6 +13,7 @@ class Course < ApplicationRecord
   scope :with_teacher, ->(teacher) { where(teacher: teacher) }
   scope :with_student, ->(student) { where(student: student) }
   scope :with_language, ->(language) { where(language: language).or(where(language: nil).with_teacher(language.teachers)) }
+  scope :within_month, ->(year, month) { where('extract(year from time_slot)::integer = ? and extract(month from time_slot)::integer = ?', year, month) }
 
   scope :on_day, ->(year, month, day) { where('time_slot::date = ?', Date.new(year, month, day)) }
   scope :signed_up, -> { where.not(student: nil) }
@@ -34,15 +35,15 @@ class Course < ApplicationRecord
 
     def months(year)
       distinct
-        .where('extract(year from time_slot) = ?', year)
+        .where('extract(year from time_slot)::integer = ?', year)
         .order(:month)
         .pluck(Arel.sql('extract(month from time_slot)::integer as month'))
     end
 
     def days(year, month)
       distinct
-        .where('extract(year from time_slot) = ?', year)
-        .where('extract(month from time_slot) = ?', month)
+        .where('extract(year from time_slot)::integer = ?', year)
+        .where('extract(month from time_slot)::integer = ?', month)
         .order(:day)
         .pluck(Arel.sql('extract(day from time_slot)::integer as day'))
     end

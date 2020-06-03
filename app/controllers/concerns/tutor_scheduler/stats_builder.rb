@@ -29,32 +29,26 @@ module TutorScheduler
     end
 
     def stats(courses, group_by, group_range)
-      courses = courses.group group_by
+      courses = courses.group(group_by)
       [build_details_stats(courses, group_range)]
     end
 
     def monthly_stats(courses)
-      stats courses, 'extract(day from time_slot)::integer', 1..31
+      stats(courses, 'extract(day from time_slot)::integer', 1..31)
     end
 
     def weekly_stats(courses)
-      stats courses, 'extract(dow from time_slot)::integer', 0..6
-    end
-
-    def limit_to_month(courses, year, month)
-      courses
-        .where 'extract(year from time_slot)::integer = ? and extract(month from time_slot)::integer = ?',
-               year, month
+      stats(courses, 'extract(dow from time_slot)::integer', 0..6)
     end
 
     def month_courses_by_teacher_name
       teacher = Teacher.find_by(name: params[:item])
-      limit_to_month teacher.courses, params[:year].to_i, params[:month].to_i
+      teacher.courses.within_month(params[:year].to_i, params[:month].to_i)
     end
 
     def month_courses_by_language_name
       language = Language.find_by(name: params[:item])
-      limit_to_month Course.with_language(language), params[:year].to_i, params[:month].to_i
+      Course.with_language(language).within_month(params[:year].to_i, params[:month].to_i)
     end
   end
 end

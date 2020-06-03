@@ -9,6 +9,10 @@ RSpec.describe 'Student', type: :system, js: true do
   let!(:teacher) { create(:teacher_with_courses, languages: [english, spanish]) }
   let(:course) { teacher.courses.order(time_slot: :asc).first }
 
+  let(:french) { create(:language, :french) }
+  let(:italian) { create(:language, :italian) }
+  let(:other_teacher) { create(:teacher_with_courses, languages: [french, italian]) }
+
   before { sign_in user }
 
   it 'does not have access to admin section' do
@@ -28,6 +32,71 @@ RSpec.describe 'Student', type: :system, js: true do
     expect(page).not_to have_text('Registering new courses slots')
     expect(page).not_to have_text('Action required')
     expect(page).not_to have_text('Current slots')
+  end
+
+  context 'when filtering available courses' do
+
+    before do
+      test_day = course.time_slot
+      if other_teacher.courses.on_day(test_day.year, test_day.month, test_day.day).empty?
+        other_teacher.courses.create(time_slot: course.time_slot, zoom_url: 'http://zoom.url')
+      end
+    end
+
+    it 'can filter by teacher' do
+      open_course_reservation_page(course, other_teacher.name)
+      expect(page).not_to have_text(teacher.name)
+      teacher.languages.each { |lang| expect(page).not_to have_text("[#{lang.name}]") }
+      expect(page).to have_text(other_teacher.name)
+      other_teacher.languages.each { |lang| expect(page).to have_text("[#{lang.name}]") }
+    end
+
+    it 'can filter by language' do
+      open_course_reservation_page(course, nil, french.name)
+      expect(page).not_to have_text(teacher.name)
+      teacher.languages.each { |lang| expect(page).not_to have_text("[#{lang.name}]") }
+      expect(page).to have_text(other_teacher.name)
+      other_teacher.languages.each do |lang|
+        if lang == french
+          expect(page).to have_text("[#{lang.name}]")
+        else
+          expect(page).not_to have_text("[#{lang.name}]")
+        end
+      end
+    end
+  end
+
+  context 'when teaching at the same time' do
+    before do
+      test_day = course.time_slot
+      other_teacher_time_slots = other_teacher.courses
+                                              .on_day(test_day.year, test_day.month, test_day.day)
+                                              .map(&:time_slot)
+      teacher_time_slots = teacher.courses
+                                  .on_day(test_day.year, test_day.month, test_day.day)
+                                  .map(&:time_slot)
+
+      teacher_time_slots.each do |time_slot|
+        unless other_teacher_time_slots.include? time_slot
+          other_teacher.courses.create(time_slot: time_slot, zoom_url: 'http://zoom.url')
+        end
+      end
+
+      other_teacher_time_slots.each do |time_slot|
+        unless teacher_time_slots.include? time_slot
+          teacher.courses.create(time_slot: time_slot, zoom_url: 'http://zoom.url')
+        end
+      end
+      sign_in teacher.user
+    end
+
+    it 'cant sign up a course' do
+      RSpec::Matchers.define_negated_matcher :not_change, :change
+      open_course_reservation_page(course, other_teacher.name)
+      expect { click_on "[#{french.name}]", match: :first }
+        .to not_change(teacher.user, :remaining_tickets)
+      expect(page).to have_text('Unable to sign up : You already have a teaching slot registered at the same time.')
+    end
   end
 
   context 'when no remaining ticket' do
@@ -61,14 +130,14 @@ RSpec.describe 'Student', type: :system, js: true do
     end
 
     it 'cant bypass ticket count verification' do
+      RSpec::Matchers.define_negated_matcher :not_change, :change
       expect(page).to have_text("[#{spanish.name}]") # Load page
       user.use_ticket while user.remaining_tickets > 0 # Use available ticket on another tab
       expect do # then come back and click to sign up
         click_on "[#{spanish.name}]", match: :first
         expect(page).to have_text('You need a ticket to reserve a course.')
       end
-        .to change(user, :remaining_tickets)
-        .by(0)
+        .to not_change(user, :remaining_tickets)
     end
   end
 

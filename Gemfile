@@ -81,7 +81,9 @@ group :development do
   gem 'pry'
   gem 'pry-doc'
 
-  gem 'sgcop', github: 'SonicGarden/sgcop'
+  gem 'sgcop', github: 'SonicGarden/sgcop', require: false
+
+  gem 'reek', require: false
 end
 
 group :test do

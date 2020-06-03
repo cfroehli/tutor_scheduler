@@ -4,27 +4,27 @@ Remaining tickets : #{remaining_tickets}
 %hr/
 - if remaining_tickets.positive?
   - if @years.empty?
-    - if @year
+    - if @year.positive?
       %span &#47;
-      = link_to @year.to_s, courses_path(language: @lang_code, teacher: @teacher_name, year: @year)
+      = link_to @year, courses_path(language: @lang_code, teacher: @teacher_name, year: @year)
       - if @months.empty?
         %span &#47;
-        = link_to @month.to_s, courses_path(language: @lang_code, teacher: @teacher_name, year: @year, month: @month)
+        = link_to @month, courses_path(language: @lang_code, teacher: @teacher_name, year: @year, month: @month)
         - if @days.empty?
           %span &#47;
-          = link_to @day.to_s, courses_path(language: @lang_code, teacher: @teacher_name, year: @year, month: @month)
+          = link_to @day, courses_path(language: @lang_code, teacher: @teacher_name, year: @year, month: @month)
         - else
           %br/
           .day-selection
             Choose a day :
             - @days.each do |day|
-              = link_to day.to_s, courses_path(language: @lang_code, teacher: @teacher_name, year: @year, month: @month, day: day)
+              = link_to day, courses_path(language: @lang_code, teacher: @teacher_name, year: @year, month: @month, day: day)
       - else
         %br/
         .month-selection
           Choose a month :
           - @months.each do |month|
-            = link_to month.to_s, courses_path(language: @lang_code, teacher: @teacher_name, year: @year, month: month)
+            = link_to month, courses_path(language: @lang_code, teacher: @teacher_name, year: @year, month: month)
     - else
       No course available.
   - else
@@ -42,23 +42,22 @@ Remaining tickets : #{remaining_tickets}
             = link_to 'No filter', courses_path(language: @lang_code, teacher: nil), class: "dropdown-item #{'active' if @teacher_name.nil?}"
             .dropdown-divider
             - teachers.pluck(:name).each do |teacher_name|
-              = link_to teacher_name.to_s, courses_path(language: @lang_code, teacher: teacher_name),
+              = link_to teacher_name, courses_path(language: @lang_code, teacher: teacher_name),
                 class: "dropdown-item #{'active' if @teacher_name == teacher_name}"
       .dropdown.col-sm-5
         %button.btn.btn-primary.dropdown-toggle#lang_filter{ type: 'button', 'data-toggle': 'dropdown', aria: { haspopup: 'true', expanded: 'false' } }
           Language: #{@lang_code || 'No filter'}
           .dropdown-menu{ 'aria-labelledby': 'lang_filter' }
-            = link_to courses_path(language: nil, teacher: @teacher_name), class: "dropdown-item #{'active' if @lang_code.nil?}" do
-              No filter
+            = link_to 'No filter', courses_path(language: nil, teacher: @teacher_name), class: "dropdown-item #{'active' if @lang_code.nil?}"
             - TeachedLanguage.active.where(teacher: teachers).joins(:language).distinct.pluck(:code, :name).each do |lang_code, lang_name|
               = link_to lang_name, courses_path(language: lang_code, teacher: @teacher_name), class: "dropdown-item #{'active' if @lang_code == lang_code}"
     %br/
     .year-selection
       Choose a year :
       - @years.each do |year|
-        = link_to year.to_s, courses_path(language: @lang_code, teacher: @teacher_name, year: year)
+        = link_to year, courses_path(language: @lang_code, teacher: @teacher_name, year: year)
   %hr/
-  - unless @courses.empty?
+  - if @courses_schedule
     - content_for :packs, 'bootstrap-table'
     %table{ 'data-toggle': 'table' }
       %thead
@@ -66,17 +65,17 @@ Remaining tickets : #{remaining_tickets}
           %th.col-sm-2 Hour
           %th.col-sm-10 Available Courses
       %tbody
-        - @courses.keys.sort.each do |slot|
+        - @courses_schedule.keys.sort.each do |slot|
           %tr
             %td #{slot}H00 ~ #{slot + 1}H00
             %td
-              - @courses[slot].each do |course|
+              - @courses_schedule[slot].each do |course|
                 - teacher = course.teacher
                 .col-sm-3
                   .card
                     .card-header
                       Teacher
-                      = link_to teacher.user.username.to_s, teacher_path(teacher)
+                      = link_to teacher.name, teacher_path(teacher)
                     .card-body
                       :ruby
                         languages = teacher.languages

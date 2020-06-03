@@ -7,10 +7,10 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable, :recoverable, :rememberable, :validatable
 
   validates :username, presence: true, uniqueness: { case_sensitive: false },
-                       length: { minimum: 1, maximum: 20 }, format: /\A[a-zA-Z0-9_\.]+\z/
+                       length: { minimum: 1, maximum: 20 }, format: /\A[a-zA-Z0-9_.]+\z/
 
-  has_one :teacher_profile, class_name: 'Teacher'
-  has_many :courses, foreign_key: 'student_id', inverse_of: :student
+  has_one :teacher_profile, class_name: 'Teacher', dependent: :destroy
+  has_many :courses, foreign_key: 'student_id', inverse_of: :student, dependent: :destroy
 
   has_many :tickets, dependent: :destroy
 
@@ -41,7 +41,7 @@ class User < ApplicationRecord
   def set_stripe_subscription(subscription_id, plan_id)
     self.stripe_subscription_id = subscription_id
     self.stripe_plan_id = plan_id
-    self.save
+    save
   end
 
   def use_ticket
@@ -53,7 +53,9 @@ class User < ApplicationRecord
   end
 
   def add_tickets(ticket_count, expiration = nil)
+    expiration = Time.zone.at(expiration) if expiration
     tickets.create(initial_count: ticket_count, remaining: ticket_count, expiration: expiration)
+    save
   end
 
   def remaining_tickets
@@ -65,7 +67,7 @@ class User < ApplicationRecord
   end
 
   def ensure_teacher_profile
-    return teacher_profile unless teacher_profile.nil?
+    return teacher_profile if teacher_profile
 
     self.create_teacher_profile(name: username, presentation: 'Present yourself here...')
   end

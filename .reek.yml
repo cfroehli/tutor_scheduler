@@ -1,3 +1,11 @@
+detectors:
+  Attribute:
+    exclude:
+      - "User#login"
+
+  TooManyStatements:
+    max_statements: 8
+
 directories:
   "app/controllers":
     IrresponsibleModule:
@@ -32,3 +40,7 @@ directories:
   "app/uploaders":
     IrresponsibleModule:
       enabled: false
+
+exclude_paths:
+  - "db/"
+  - "spec/"

@@ -8,18 +8,19 @@ class Teacher < ApplicationRecord
   has_many :teached_languages, -> { active }, inverse_of: :teacher
   has_many :languages, through: :teached_languages
 
-  has_many :courses
+  has_many :courses, dependent: :destroy
 
   mount_uploader :image, ProfileImageUploader
 
   def add_language(language_id)
     language = Language.find(language_id)
     teached_language = TeachedLanguage.find_by(teacher: self, language: language)
+    language_name = language.name
     if teached_language
-      { info: "Language #{language.name} already available for teacher #{name}." }
+      { info: "Language #{language_name} already available for teacher #{name}." }
     else
       self.teached_languages.create(language: language)
-      { success: "Language #{language.name} added to teacher #{name}." }
+      { success: "Language #{language_name} added to teacher #{name}." }
     end
   end
 end

@@ -8,47 +8,10 @@ class CoursesController < ApplicationController
   before_action :ensure_has_tickets, only: %i[sign_up]
 
   def index
-    @years   = []
-    @months  = []
-    @days    = []
-    @courses = []
-
-    @year = params[:year]
-    @month = params[:month]
-    @day = params[:day]
-
-    courses = Course.all
-
-    @lang_code = params[:language]
-    if @lang_code.present?
-      language = Language.find_by(code: @lang_code)
-      courses = courses.with_language(language) unless language.nil?
-    end
-
-    @teacher_name = params[:teacher]
-    if @teacher_name.present?
-      teacher = Teacher.find_by(name: @teacher_name)
-      courses = courses.with_teacher(teacher) unless teacher.nil?
-    end
-
-    courses = courses.available
-
-    if @year
-      if @month
-        if @day
-          @courses = Hash.new { |h, k| h[k] = [] }
-          courses.on_day(@year.to_i, @month.to_i, @day.to_i).each do |course|
-            @courses[course.time_slot.hour].push(course)
-          end
-        else
-          @days = courses.days(@year.to_i, @month.to_i)
-        end
-      else
-        @months = courses.months(@year.to_i)
-      end
-    else
-      @years = courses.years
-    end
+    @year = params[:year].to_i
+    @month = params[:month].to_i
+    @day = params[:day].to_i
+    setup_course_selector
   end
 
   def show
@@ -63,8 +26,7 @@ class CoursesController < ApplicationController
     days.each do |day|
       hours.each do |hour|
         time_slot = DateTime.parse("#{day} #{hour}")
-        course = current_user.teacher_profile.courses.new(time_slot: time_slot, zoom_url: zoom_url)
-        no_error &= course.save
+        no_error &= current_user.teacher_profile.courses.create(time_slot: time_slot, zoom_url: zoom_url)
       end
     end
 
@@ -77,9 +39,7 @@ class CoursesController < ApplicationController
 
   def update
     post_params = params.require(:course).permit(:zoom_url, :content, :feedback)
-    if @course.update(post_params)
-      flash[:success] = 'Course was successfully updated.'
-    end
+    flash[:success] = 'Course was successfully updated.' if @course.update(post_params)
     redirect_back fallback_location: root_path
   end
 
@@ -98,18 +58,16 @@ class CoursesController < ApplicationController
 
   def ensure_slot_allowed
     teacher_profile = current_user.teacher_profile
-    return if teacher_profile.nil?
+    return unless teacher_profile
 
     if teacher_profile.id == @course.teacher.id
       flash[:info] = 'Unable to sign up for your own course.'
-      redirect_back fallback_location: root_path
-      return
+    else
+      teaching_slot = teacher_profile.courses.where(time_slot: @course.time_slot)
+      return if teaching_slot.empty?
+
+      flash[:info] = 'Unable to sign up : You already have a teaching slot registered at the same time.'
     end
-
-    teaching_slot = teacher_profile.courses.where(time_slot: @course.time_slot)
-    return if teaching_slot.empty?
-
-    flash[:info] = 'Unable to sign up : You already have a teaching slot registered at the same time.'
     redirect_back fallback_location: root_path
   end
 
@@ -118,5 +76,68 @@ class CoursesController < ApplicationController
 
     flash[:danger] = 'You need a ticket to reserve a course.'
     redirect_back fallback_location: root_path
+  end
+
+  def courses
+    @courses ||= build_available_courses_set
+  end
+
+  def build_available_courses_set
+    courses = Course.all
+    courses = filter_by_language(courses)
+    courses = filter_by_teacher(courses)
+    courses.available
+  end
+
+  def filter_by_language(courses)
+    @lang_code = params[:language]
+    if @lang_code.present?
+      language = Language.find_by(code: @lang_code)
+      courses = courses.with_language(language) if language
+    end
+    courses
+  end
+
+  def filter_by_teacher(courses)
+    @teacher_name = params[:teacher]
+    if @teacher_name.present?
+      teacher = Teacher.find_by(name: @teacher_name)
+      courses = courses.with_teacher(teacher) if teacher
+    end
+    courses
+  end
+
+  def setup_course_daily_schedule
+    @courses_schedule = Hash.new { |hash, key| hash[key] = [] }
+    courses.on_day(@year, @month, @day).each do |course|
+      @courses_schedule[course.time_slot.hour].push(course)
+    end
+  end
+
+  def setup_course_day_selector
+    if @day.positive?
+      setup_course_daily_schedule
+    else
+      @days = courses.days(@year, @month)
+    end
+  end
+
+  def setup_course_month_selector
+    if @month.positive?
+      setup_course_day_selector
+    else
+      @months = courses.months(@year)
+    end
+  end
+
+  def setup_course_selector
+    @years   = []
+    @months  = []
+    @days    = []
+    if @year.positive?
+      setup_course_month_selector
+    else
+      @years = courses.years
+    end
   end
 end

@@ -47,16 +47,17 @@ module TutorScheduler
     def self.create(item_id)
       sku = ::Stripe::SKU.retrieve(item_id)
       attributes = sku.attributes
+      lot_size = attributes[:lot_size]
       {
         mode: 'payment',
         line_items: [{
           name: attributes[:name],
           amount: sku[:price],
-          description: "Can be used to reserve #{attributes[:lot_size]}x1H course",
+          description: "Can be used to reserve #{lot_size}x1H course",
           currency: 'jpy',
           quantity: 1,
         }],
-        metadata: { lot_size: attributes[:lot_size] },
+        metadata: { lot_size: lot_size },
       }
     end
   end
