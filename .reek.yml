@@ -16,6 +16,9 @@ directories:
   "app/jobs":
     IrresponsibleModule:
       enabled: false
+  "app/policies":
+    IrresponsibleModule:
+      enabled: false
   "app/mailers":
     IrresponsibleModule:
       enabled: false
