@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Billy.configure do |config|
   config.proxy_host = ENV.fetch('RAILS_TEST_PROXY_HOST') { '127.0.0.1' }
 end

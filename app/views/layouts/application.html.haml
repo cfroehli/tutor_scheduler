@@ -55,8 +55,8 @@
                 Logout
       %br/
       - flash.each do |flash_type, flash_content|
-        .alert{class: "alert-#{flash_type} alert-dismissible fade show",
-               role: 'alert'}
+        .alert{ class: "alert-#{flash_type} alert-dismissible fade show",
+                role: 'alert' }
           = flash_content
           %button.close{type: 'button',
                         'data-dismiss': 'alert',
