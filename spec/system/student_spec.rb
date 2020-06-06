@@ -35,7 +35,6 @@ RSpec.describe 'Student', type: :system, js: true do
   end
 
   context 'when filtering available courses' do
-
     before do
       test_day = course.time_slot
       if other_teacher.courses.on_day(test_day.year, test_day.month, test_day.day).empty?

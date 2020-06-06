@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Capybara.default_max_wait_time = ENV['TRAVIS'] ? 30 : 5
 puts "WebServer timeout set to #{Capybara.default_max_wait_time}s"
 
