@@ -68,10 +68,13 @@ RSpec.configure do |config|
   # config.filter_gems_from_backtrace("gem name")
 
   config.before(:suite) do
-    FileUtils.rm_rf(Rails.root.join('coverage'))
     FileUtils.rm_rf(Rails.root.join('tmp', 'screenshots'))
+    FileUtils.rm_rf(Rails.root.join('coverage'))
 
-    FileUtils.rm_rf(Rails.root.join('stripe-mock-server.log'))
+    FileUtils.rm_f(Rails.root.join(StripeMock.default_server_log_path))
+
+    FileUtils.rm_rf(CarrierWave::Uploader::Base.cache_dir)
+    FileUtils.rm_rf(CarrierWave::Uploader::Base.store_dir)
 
     FileUtils.rm_rf(Billy.config.certs_path)
     FileUtils.rm_rf(Billy.config.cache_path)
