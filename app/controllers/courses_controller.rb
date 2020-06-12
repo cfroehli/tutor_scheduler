@@ -83,28 +83,28 @@ class CoursesController < ApplicationController
   end
 
   def build_available_courses_set
-    courses = Course.all
-    courses = filter_by_language(courses)
-    courses = filter_by_teacher(courses)
-    courses.available
+    courses_set = Course.all
+    courses_set = filter_by_language(courses_set)
+    courses_set = filter_by_teacher(courses_set)
+    courses_set.available
   end
 
-  def filter_by_language(courses)
+  def filter_by_language(filtered_courses)
     @lang_code = params[:language]
     if @lang_code.present?
       language = Language.find_by(code: @lang_code)
-      courses = courses.with_language(language) if language
+      filtered_courses = filtered_courses.with_language(language) if language
     end
-    courses
+    filtered_courses
   end
 
-  def filter_by_teacher(courses)
+  def filter_by_teacher(filtered_courses)
     @teacher_name = params[:teacher]
     if @teacher_name.present?
       teacher = Teacher.find_by(name: @teacher_name)
-      courses = courses.with_teacher(teacher) if teacher
+      filtered_courses = filtered_courses.with_teacher(teacher) if teacher
     end
-    courses
+    filtered_courses
   end
 
   def setup_course_daily_schedule
