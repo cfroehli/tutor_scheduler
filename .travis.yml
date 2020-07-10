@@ -1,0 +1,41 @@
+os: linux
+dist: bionic
+
+services:
+  - postgresql
+
+addons:
+  chrome: stable
+
+language: ruby
+cache:
+  bundler: true
+  yarn: true
+  directories:
+    - /home/travis/.rvm/
+    - node_modules
+
+before_install:
+  - bundle config set without production
+  - bundle config set path vendor/bundle
+
+install:
+  - bundle install
+  - nvm install node
+  - node -v
+  - npm i -g yarn
+  - yarn install
+
+before_script:
+  - curl -o cc-test-reporter -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64
+  - chmod +x ./cc-test-reporter
+  - ./cc-test-reporter before-build
+  - cp config/database.yml.travis config/database.yml
+  - bundle exec rails db:create
+  - bundle exec rails db:migrate
+
+script:
+  - COVERAGE=true bundle exec rails spec
+
+after_script:
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT

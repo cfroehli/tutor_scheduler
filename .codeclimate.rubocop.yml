@@ -1,0 +1,182 @@
+require:
+  - rubocop-rails
+  - rubocop-rspec
+  - rubocop-performance
+
+AllCops:
+  Exclude:
+    - "bin/*"
+    - "config/application.rb"
+    - "config/backup.rb"
+    - "config/environments/*"
+    - "config/initializers/*"
+    - "config/unicorn.rb"
+    - "config/spring.rb"
+    - "config/puma.rb"
+    - "config.ru"
+    - "db/schema.rb"
+    - "deploy/*"
+    - "node_modules/**/*"
+    - "spec/rails_helper.rb"
+    - "spec/spec_helper.rb"
+    - "vendor/**/*"
+  DisplayCopNames: true
+  DisplayStyleGuide: true
+  ExtraDetails: true
+
+Style/AsciiComments:
+  Enabled: false
+
+Style/BlockDelimiters:
+  AutoCorrect: false
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+Style/CollectionMethods:
+  PreferredMethods:
+    detect: "detect"
+    find: "detect"
+
+Style/Documentation:
+  Enabled: false
+
+Style/DoubleNegation:
+  Enabled: false
+
+Style/FormatString:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/GuardClause:
+  MinBodyLength: 5
+
+Style/IfUnlessModifier:
+  Enabled: false
+
+Style/Lambda:
+  EnforcedStyle: literal
+
+Style/NumericLiterals:
+  MinDigits: 7
+
+Style/PerlBackrefs:
+  AutoCorrect: false
+
+Naming/PredicateName:
+  ForbiddenPrefixes:
+    - is_
+    - have_
+  NamePrefix:
+    - is_
+    - have_
+
+Style/RedundantSelf:
+  Enabled: false
+
+Style/SingleLineBlockParams:
+  Enabled: false
+
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: comma
+
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: comma
+
+Style/HashEachMethods:
+  Enabled: true
+Style/HashTransformKeys:
+  Enabled: true
+Style/HashTransformValues:
+  Enabled: true
+Style/ExponentialNotation:
+  Enabled: true
+Style/SlicingWithRange:
+  Enabled: true
+Lint/RaiseException:
+  Enabled: true
+Lint/StructNewOverride:
+  Enabled: true
+Layout/SpaceAroundMethodCallOperator:
+  Enabled: true
+Layout/EmptyLinesAroundAttributeAccessor:
+  Enabled: true
+
+
+Lint/InheritException:
+  EnforcedStyle: standard_error
+
+Lint/UnderscorePrefixedVariableName:
+  Enabled: false
+
+Lint/UnusedMethodArgument:
+  Enabled: false
+
+Metrics/AbcSize:
+  Exclude:
+    - "db/migrate/*"
+  Max: 30
+
+Metrics/MethodLength:
+  Exclude:
+    - "db/migrate/*"
+  Max: 20
+
+Layout/FirstArrayElementIndentation:
+  EnforcedStyle: consistent
+
+Layout/LineLength:
+  Max: 160
+
+Rails:
+  Enabled: true
+
+Rails/UniqBeforePluck:
+  Enabled: false
+
+Rails/UnknownEnv:
+  Environments:
+    - production
+    - development
+    - test
+    - staging
+
+Metrics/BlockLength:
+  ExcludedMethods:
+    - refine
+    - included
+    - namespace
+  Exclude:
+    - "config/routes.rb"
+    - "spec/**/*"
+    - "db/migrate/*"
+
+Style/EmptyMethod:
+  Enabled: false
+
+RSpec/AnyInstance:
+  Enabled: false
+
+RSpec/ContextWording:
+  Enabled: false
+
+RSpec/DescribedClass:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/ExampleLength:
+  Enabled: false
+
+RSpec/EmptyExampleGroup:
+  Enabled: false
+
+Naming/AsciiIdentifiers:
+  Exclude:
+    - "spec/mailers/previews/*.rb"
+Naming/MethodName:
+  Exclude:
+    - "spec/mailers/previews/*.rb"

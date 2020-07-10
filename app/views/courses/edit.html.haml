@@ -1,0 +1,25 @@
+.h3.text-center Edit course
+
+= form_with model: @course do |f|
+  - if @course.errors.any?
+    #error_explanation
+      %h2 #{pluralize(@course.errors.count, 'error')} prohibited this course from being saved:
+      %ul
+        - @course.errors.full_messages.each do |message|
+          %li= message
+
+  .form-group.row
+    = f.label :zoom_url, class: 'col-form-label col-sm-2'
+    = f.text_field :zoom_url, class: 'form-control col-sm-10'
+
+  .form-group.row
+    = f.label :content, class: 'col-form-label col-sm-2'
+    = f.text_area :content, rows: 15, id: 'content-area', class: 'form-control col-sm-10'
+
+  .form-group.row
+    = f.label :feedback, class: 'col-form-label col-sm-2'
+    = f.text_area :feedback, rows: 15, id: 'feedback-area', class: 'form-control col-sm-10'
+
+  %br/
+  .text-center
+    = f.button 'Submit', class: 'btn btn-primary'

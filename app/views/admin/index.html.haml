@@ -1,0 +1,71 @@
+- content_for :packs, 'bootstrap-table'
+
+%h3.text-center Administration
+
+#impersonation.card
+  .card-header User impersonation
+  .card-body
+    - User.order(:id).each do |user|
+      - next if user == current_user
+      .card-text
+        Sign in as
+        = link_to user.username, impersonate_admin_path(user), method: :post
+
+%br/
+
+#teacher-register.card
+  .card-header Register user as a teacher
+  .card-body
+    .card-text
+      = form_with url: add_language_teachers_path do |f|
+        .row
+          = f.label :user, class: 'form-control col-sm-2'
+          = f.collection_select :user, User.all, :id, :username, {}, { class: 'form-control col-sm-4' }
+          = f.label :language, class: 'form-control col-sm-2'
+          = f.collection_select :language, Language.all, :id, :name, {}, { class: 'form-control col-sm-4' }
+
+        .text-center
+          = f.button 'Add', class: 'btn btn-primary'
+
+%br/
+
+- active_lang, inactive_lang = TeachedLanguage.status
+#active-languages.card
+  .card-header Active languages
+  .card-body
+    .card-text
+      %table#active_lang{ 'data-toggle': 'table' }
+        %thead
+          %tr
+            %th Teacher
+            %th Language
+            %th Actions
+        %tbody
+          - active_lang.each do |teached_language|
+            %tr
+              %td= teached_language.teacher.name
+              %td= teached_language.language.name
+              %td
+                = link_to deactivate_teached_language_path(teached_language) do
+                  %i.fas.fa-toggle-on
+
+%br/
+
+#inactive-languages.card
+  .card-header Inactive languages
+  .card-body
+    .card-text
+      %table#inactive_lang{ 'data-toggle': 'table' }
+        %thead
+          %tr
+            %th Teacher
+            %th Language
+            %th Actions
+        %tbody
+          - inactive_lang.each do |teached_language|
+            %tr
+              %td= teached_language.teacher.name
+              %td= teached_language.language.name
+              %td
+                = link_to activate_teached_language_path(teached_language) do
+                  %i.fas.fa-toggle-off

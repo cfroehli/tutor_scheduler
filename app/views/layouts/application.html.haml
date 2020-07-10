@@ -1,64 +1,71 @@
 !!!
 %html
   %head
-    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %meta{content: 'text/html; charset=UTF-8', 'http-equiv': 'Content-Type'}/
     %title TutorScheduler
     = csrf_meta_tags
     = csp_meta_tag
 
-    = javascript_pack_tag 'application', 'data-turbolinks-track': 'reload'
-
-    = stylesheet_pack_tag 'bootstrap4', media: 'all', 'data-turbolinks-track': 'reload'
-    = stylesheet_pack_tag 'fontawesome', media: 'all', 'data-turbolinks-track': 'reload'
-
+    - packs = (['common'] + (content_for(:packs) || '').split(/,/)).uniq
+    = javascript_packs_with_chunks_tag(*packs, 'data-turbolinks-track': 'reload', defer: true)
+    = yield :extra_js
+    - no_css_packs = (content_for(:no_css_packs) || '').split(/,/).uniq
+    - packs = packs.filter { |pack| !no_css_packs.include? pack }
+    = stylesheet_packs_with_chunks_tag(*packs, media: 'all', 'data-turbolinks-track': 'reload')
     = yield :extra_styles
-
   %body
     .container
       %nav.navbar.navbar-expand-lg.navbar-light.bg-light
         %span.navbar-brand.mb-0.h1 Tutor Scheduler
         %button.navbar-toggler{type: 'button',
-                               data: {toggle: 'collapse',
-                                      target: '#navbarNav'},
-                               aria: {controls: 'navbarNav',
-                                      expanded: 'false',
-                                      label: 'Toggle navigation'}}
+                               data: { toggle: 'collapse',
+                                       target: '#navbarNav' },
+                               aria: { controls: 'navbarNav',
+                                       expanded: 'false',
+                                       label: 'Toggle navigation' } }
           %span.navbar-toggler-icon
         .navbar-collapse.collapse#navbarNav
           .navbar-nav
             = link_to root_path, class: 'nav-item nav-link' do
               %i.fas.fa-tachometer-alt
               Dashboard
-            = link_to courses_path, class: 'nav-item nav-link' do
-              %i.fas.fa-user-graduate
-              Learning
             - if user_signed_in?
-              - if !current_user.teacher_profile.nil?
-                = link_to teachers_path, class: 'nav-item nav-link' do
+              = link_to new_ticket_path, class: 'nav-item nav-link' do
+                %i.fas.fa-ticket-alt
+                Tickets
+              = link_to courses_path, class: 'nav-item nav-link' do
+                %i.fas.fa-user-graduate
+                Learning
+              - unless current_user.teacher_profile.nil?
+                = link_to teacher_path(current_user.teacher_profile), class: 'nav-item nav-link' do
                   %i.fas.fa-school
                   Teaching
+              - if current_user.has_role? :admin
+                = link_to admin_index_path, class: 'nav-item nav-link' do
+                  %i.fas.fa-user-shield
+                  Admin
+                = link_to stats_path, class: 'nav-item nav-link' do
+                  %i.fas.fa-chart-bar
+                  Stats
               = link_to edit_user_registration_path, class: 'nav-item nav-link' do
                 %i.fas.fa-user-cog
                 User settings
               = link_to destroy_user_session_path, class: 'nav-item nav-link', method: :delete do
                 %i.fas.fa-sign-out-alt
                 Logout
-
       %br/
-
       - flash.each do |flash_type, flash_content|
-        .alert{class: "alert-#{flash_type} alert-dismissible fade show",
-               role: 'alert'}
+        .alert{ class: "alert-#{flash_type} alert-dismissible fade show",
+                role: 'alert' }
           = flash_content
           %button.close{type: 'button',
                         'data-dismiss': 'alert',
                         'aria-label': 'Close'}
             %span{'aria-hidden': 'true'}
               &times;
-
       = yield
-
-      = javascript_pack_tag 'bootstrap4', 'data-turbolinks-track': 'reload'
-      = javascript_pack_tag 'fontawesome', 'data-turbolinks-track': 'reload'
-
-      = yield :extra_js
+      - if current_user != true_user
+        .text-center.text-danger
+          o-o-o You are currently signed in as [#{current_user.username}] -
+          = link_to 'Cancel impersonation', stop_impersonating_admin_index_path, method: :post
+          o-o-o

@@ -1,9 +1,13 @@
-class TicketsController < ApplicationController
-  def create
-    current_user.tickets += 1
-    current_user.save
+# frozen_string_literal: true
 
-    flash[:success] = "User #{current_user} now have #{current_user.tickets} tickets"
+class TicketsController < ApplicationController
+  def order_cancel
+    flash[:success] = 'Your order has been cancelled.'
+    redirect_to courses_path
+  end
+
+  def order_success
+    flash[:success] = 'Your order has been processed.'
     redirect_to courses_path
   end
 end

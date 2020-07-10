@@ -1,0 +1,8 @@
+.h1
+  Dear #{@course.student.username},
+
+%p
+  Teacher #{@course.teacher.name} updated the feedback on #{@course.language.name} course from #{@course.time_slot}.
+
+%p
+  @course.feedback.to_s

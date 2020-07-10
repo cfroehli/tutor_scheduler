@@ -1,14 +1,12 @@
-import 'css/bootstrap-tempusdominus.scss';
+import $ from 'jquery';
 
-import 'moment';
 import 'tempusdominus-bootstrap-4';
 
-document.addEventListener("turbolinks:load", () => {
-  $("input.datetimepicker-input").each(function() {
-    var picker_group = $($(this).data("target"));
+$(document).on("turbolinks:load", function() {
+  $(".datetimepicker-input").each(function() {
+    var picker_group = $($(this).data('target'));
     picker_group.datetimepicker({
-      format: picker_group.data('date-format'),
-      disabledTimeIntervals: [[moment({ h: 0 }), moment({ h: 7 })], [moment({ h: 23 }), moment({ h: 24 })]],
+      debug: true,
       icons: {
         time:     'far fa-clock',
         date:     'far fa-calendar',
@@ -18,7 +16,8 @@ document.addEventListener("turbolinks:load", () => {
         next:     'fas fa-chevron-right',
         today:    'far fa-calendar-check',
         clear:    'far fa-trash',
-        close:    'far fa-times'
-      } });
+        close:    'far fa-times' },
+      disabledHours: [0, 1, 2, 3, 4, 5, 6, 23, 24 ]
+    });
   });
 });

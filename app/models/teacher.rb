@@ -1,13 +1,26 @@
+# frozen_string_literal: true
+
 class Teacher < ApplicationRecord
-  # TODO add db constraint
-  # validates :courses, uniqueness: { scope: :teacher_id, message: 'This profile already exist' }
-  
+  validates :name, uniqueness: true, length: { minimum: 1, maximum: 20 }, format: /\A[a-zA-Z0-9_ .\-]+\z/
+
   belongs_to :user
 
-  has_many :teached_languages
+  has_many :teached_languages, -> { active }, inverse_of: :teacher
   has_many :languages, through: :teached_languages
-  
-  has_many :courses
+
+  has_many :courses, dependent: :destroy
 
   mount_uploader :image, ProfileImageUploader
+
+  def add_language(language_id)
+    language = Language.find(language_id)
+    teached_language = TeachedLanguage.find_by(teacher: self, language: language)
+    language_name = language.name
+    if teached_language
+      { info: "Language #{language_name} already available for teacher #{name}." }
+    else
+      self.teached_languages.create(language: language)
+      { success: "Language #{language_name} added to teacher #{name}." }
+    end
+  end
 end

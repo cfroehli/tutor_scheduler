@@ -1,0 +1,37 @@
+{
+  "id": null,
+  "object": "event",
+  "api_version": "2020-03-02",
+  "created": null,
+  "data": {
+    "object": {
+      "id": null,
+      "object": "checkout.session",
+      "billing_address_collection": null,
+      "cancel_url": "https://localhost/tickets/order_cancel",
+      "client_reference_id": null,
+      "customer": null,
+      "customer_email": null,
+      "display_items": [],
+      "livemode": false,
+      "locale": null,
+      "metadata": {},
+      "mode": null,
+      "payment_intent": null,
+      "payment_method_types": [],
+      "setup_intent": null,
+      "shipping": null,
+      "shipping_address_collection": null,
+      "submit_type": null,
+      "subscription": null,
+      "success_url": "https://localhost/tickets/order_success"
+    }
+  },
+  "livemode": false,
+  "pending_webhooks": 1,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "checkout.session.completed"
+}

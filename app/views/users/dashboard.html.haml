@@ -1,29 +1,62 @@
 .card
   .card-header
     %i.fa.fa-user
-    = "#{current_user.username}'s dashboard"
+    #{current_user.username}'s dashboard
   .card-body
-    .card-text      
-      - if current_user.tickets == 0
-        Refill
-      - else
-        = "Remaining tickets: #{current_user.tickets}"
+    .card-text
+      - remaining_tickets = current_user.remaining_tickets
+      - if remaining_tickets < 1
+        No ticket available :
         = link_to new_ticket_path do
-          (Buy more)
-
-    - if !current_user.teacher_profile.nil?
+          Buy a few tickets here.
+      - else
+        Remaining tickets: #{remaining_tickets}
+        %ul
+        - current_user.tickets_validity.each do |expiration, remaining|
+          - if expiration.nil?
+            %li #{remaining} tickets without any date limit
+          - else
+            %li #{remaining} tickets to use before #{expiration}
+    - if current_user.teacher_profile
       %hr/
-    
       .card-text
-        - current_user.teacher_profile.courses.planned.each do | c |
-          = "At #{c.time_slot} => Teaching #{c.language.name} (? level) to #{c.student.username}"
-          %br/
-        
+        .h4 Planned tutoring
+        - current_user.teacher_profile.courses.planned.each do |c|
+          .row
+            .col-sm-3 At #{c.time_slot}
+            .col-sm-3
+              Teaching #{c.language.name} to #{c.student.username}
+              = link_to c.zoom_url do
+                %i.fas.fa-video
+            .col-sm-6
+              - if c.content.nil?
+                No content available yet.
+              - else
+                = c.content.to_s
     %hr/
-      
-    .card-text      
-      - current_user.courses.each do | c |
-        = "At #{c.time_slot} => Learning #{c.language.name} (?? level) with #{c.teacher.user.username}"
-        %br/
-
-  
+    .card-text
+      .h4 Planned learning
+      - current_user.courses.planned.each do |c|
+        .row
+          .col-sm-3 At #{c.time_slot}
+          .col-sm-3
+            Learning #{c.language.name} with #{c.teacher.user.username}
+            = link_to c.zoom_url do
+              %i.fas.fa-video
+          .col-sm-6
+            - if c.content.blank?
+              No content available yet
+            - else
+              = c.content.to_s
+    %hr/
+    .card-text
+      .h4 Past courses
+      - current_user.courses.past.each do |c|
+        .row
+          .col-sm-3 At #{c.time_slot}
+          .col-sm-3 Learnt #{c.language.name} with #{c.teacher.user.username}
+          .col-sm-6
+            - if c.feedback.blank?
+              No feedback available yet.
+            - else
+              = c.feedback.to_s

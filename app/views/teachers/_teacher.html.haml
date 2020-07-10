@@ -1,29 +1,19 @@
 .card
   .card-header
-    .row
-      .col-sm-8
-        - if !teacher.image.blank?
-          = cl_image_tag teacher.image, secure:true
-        = teacher.user.username
-      .col-sm-4.text-right
-        - teacher.languages.each do | teached_language |
-          = teached_language.name
+    .float-left
+      - if teacher.image.present?
+        = cl_image_tag teacher.image, secure: true
+      = link_to teacher.name, teacher_path(teacher)
+    .float-right
+      - if current_user.id == teacher.user.id
+        = link_to edit_teacher_path(teacher) do
+          %i.fa.fa-edit
+    .clearfix
   .card-body
     .row
-      .col-sm-12
-        = teacher.presentation
-
-- if teacher.user.id == current_user.id
-  %hr/
-  Planned courses
-  %br/
-  - teacher.courses.planned.each do |course|
-    = "At #{course.time_slot} teaching #{course.language.name} to #{course.student.username}"
-    %br/
-
-%hr/
-Open time slots
-%br/
-- teacher.courses.available.each do | course |
-  = "#{course.time_slot}"
-  %br/
+      Teached languages :
+      %ul
+        - teacher.languages.each do |teached_language|
+          %li= teached_language.name
+    .row
+      .col-sm-12= teacher.presentation

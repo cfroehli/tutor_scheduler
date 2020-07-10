@@ -1,0 +1,14 @@
+{
+  "id": null,
+  "object": "event",
+  "api_version": "2020-03-02",
+  "created": null,
+  "data": { "object": {} },
+  "livemode": false,
+  "pending_webhooks": 3,
+  "request": {
+    "id": "req_gLhlA52CDKQkGi",
+    "idempotency_key": null
+  },
+  "type": "invoice.payment_succeeded"
+}

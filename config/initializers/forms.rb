@@ -1,8 +1,12 @@
+# frozen_string_literal: true
+
+# rubocop:disable Layout/LineLength
+
 module ActionView
   module Helpers
     ## TODO replace default date_select by html using tempus lib so we
     ## can just write f.date_select as usual
-    ##class FormBuilder
+    # #class FormBuilder
     ##  def date_select(method, options = {}, html_options = {})
     ##    existing_date = @object.nil? ? DateTime.now : @object.send(method)
     ##    formatted_date = existing_date.to_date.strftime("%F") if existing_date.present?
@@ -24,6 +28,8 @@ module ActionView
     ##      @template.content_tag(:div, @template.content_tag(:i, "", :class => "fas fa-calendar") ,:class => "input-group-text")
     ##    end
     ##  end
-    ##end
+    # #end
   end
 end
+
+# rubocop:enable Layout/LineLength
