@@ -47,7 +47,7 @@ gem 'pundit', '~> 2.1.0'
 gem 'rolify', '~> 5.2.0'
 
 # Image upload
-gem 'carrierwave', '~> 2.1.0'
+gem 'carrierwave', '~> 2.1.1'
 gem 'cloudinary', '~> 1.14.0'
 
 # Inline css in email
